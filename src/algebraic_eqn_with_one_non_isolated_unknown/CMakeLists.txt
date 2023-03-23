@@ -1,0 +1,1 @@
+build_executable(algebraicEqnWithOneNonIsolatedUnknown)
