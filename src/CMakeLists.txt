@@ -8,3 +8,5 @@ include_directories(.)
 
 add_subdirectory(algebraic_eqn_with_one_non_isolated_unknown)
 add_subdirectory(algebraic_system_with_three_linked_unknowns)
+add_subdirectory(algebraic_system_with_various_dependencies_not_ordered)
+add_subdirectory(algebraic_system_with_various_dependencies_ordered)
