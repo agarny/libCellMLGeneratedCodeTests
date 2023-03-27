@@ -8,6 +8,11 @@ extern "C" {
 #include <nvector/nvector_serial.h>
 #include <sunlinsol/sunlinsol_dense.h>
 
+#include <cmath>
+#include <iomanip>
+#include <iostream>
+#include <limits>
+
 typedef struct {
     void (*objectiveFunction)(double *, double *, void *);
     void *data;
@@ -71,15 +76,98 @@ void nlaSolve(void (*objectiveFunction)(double *, double *, void *), double *u, 
     SUNContext_Free(&context);
 }
 
-void printVariableValues(const std::string &title, const double *variables, const std::string &note)
+uint64_t ulpsDistance(double a, double b)
 {
+    if (std::isnan(a) || std::isnan(b)) {
+        return UINT64_MAX;
+    }
+
+    if (std::isinf(a) != std::isinf(b)) {
+        return UINT64_MAX;
+    }
+
+    static const int SIZE_OF_DOUBLE = sizeof(double);
+
+    uint64_t ia;
+    uint64_t ib;
+
+    memcpy(&ia, &a, SIZE_OF_DOUBLE);
+    memcpy(&ib, &b, SIZE_OF_DOUBLE);
+
+    if (ia < ib) {
+        return ib + ~ia + 1;
+    }
+
+    return ia + ~ib + 1;
+}
+
+bool areNearlyEqual(double a, double b)
+{
+    static const double EPSILON = std::numeric_limits<double>::epsilon();
+    static const ptrdiff_t ULPS_EPSILON = 1;
+
+    if (fabs(a - b) <= EPSILON) {
+        return true;
+    }
+
+    if ((a < 0.0) != (b < 0.0)) {
+        return false;
+    }
+
+    return ulpsDistance(a, b) <= ULPS_EPSILON;
+}
+
+int iwidth(double n)
+{
+    if (areNearlyEqual(n, 0.0)) {
+        return 1;
+    }
+
+    return int(n < 0.0) + log10(fabs(trunc(n))) + 1;
+}
+
+void printVariableValues(const std::string &title, const double *variables, const std::map<std::string, double> &expectedValues)
+{
+    int w = 0;
+
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        auto cw = iwidth(variables[i]);
+
+        if (cw > w) {
+            w = cw;
+        }
+    }
+
+    int ew = 0;
+    auto ev = expectedValues.begin();
+
+    for (size_t i = 0; i < expectedValues.size(); ++i) {
+        auto ecw = iwidth((*ev).second);
+
+        if (ecw > ew) {
+            ew = ecw;
+        }
+
+        ++ev;
+    }
+
     std::cout << std::endl << "---------------------------------------[" << title << "][BEGIN]" << std::endl;
 
     for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        std::cout << "- " << VARIABLE_INFO[i].name << ": " << variables[i] << " [" << VARIABLE_INFO[i].units << "]" << std::endl;
+        std::printf("- %s: %s%.3f [%s]", VARIABLE_INFO[i].name, std::string(w - iwidth(variables[i]), ' ').c_str(), variables[i], VARIABLE_INFO[i].units);
+
+        auto expectedValue = expectedValues.find(VARIABLE_INFO[i].name);
+
+        if (expectedValue != expectedValues.end()) {
+            if (areNearlyEqual(variables[i], expectedValue->second)) {
+                std::cout << " |  OK";
+            } else {
+                std::printf(" | NOK | %s%.3f", std::string(ew - iwidth(expectedValue->second), ' ').c_str(), expectedValue->second);
+            }
+        }
+
+        std::cout << std::endl;
     }
 
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "Note: " << note << std::endl;
     std::cout << "---------------------------------------[" << title << "][END]" << std::endl;
 }

@@ -15,23 +15,20 @@ int main()
 
     double *variables = createVariablesArray();
 
-    // Initialise and output our model variables.
+    // Initialise our variables, compute our computed constants, and output our model variables.
 
     initialiseVariables(variables);
-
-    printVariableValues("Initial variable values/guesses", variables,
-                        "'x', 'y', and 'z' have an initial guess of 1.");
-
-    // Compute our model by first computing our computed constants (in case
-    // there are some) and then our variables.
-
     computeComputedConstants(variables);
+
+    printVariableValues("Initial variable values/guesses", variables, {{"x", 1.0}, {"y", 1.0}, {"z", 1.0}});
+
+    // Compute our variables.
+
     computeVariables(variables);
 
     // Output the final value of our model variables.
 
-    printVariableValues("Final variable values", variables,
-                        "'x', 'y', and 'z' should have a value of 1, -1, and 1, respectively.");
+    printVariableValues("Final variable values", variables, {{"x", 1.0}, {"y", -1.0}, {"z", 1.0}});
 
     // Clean up after ourselves.
 
