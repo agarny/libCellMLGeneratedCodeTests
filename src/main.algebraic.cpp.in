@@ -46,30 +46,76 @@ void printInformation()
     std::cout << "---------------------------------------[Information][END]" << std::endl;
 }
 
+void printValues(const std::string &title, const double *variables, const std::map<std::string, double> &expectedValues)
+{
+    int w = 0;
+
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        auto cw = iwidth(variables[i]);
+
+        if (cw > w) {
+            w = cw;
+        }
+    }
+
+    int ew = 0;
+    auto ev = expectedValues.begin();
+
+    for (size_t i = 0; i < expectedValues.size(); ++i) {
+        auto ecw = iwidth((*ev).second);
+
+        if (ecw > ew) {
+            ew = ecw;
+        }
+
+        ++ev;
+    }
+
+    std::cout << std::endl << "---------------------------------------[" << title << "][BEGIN]" << std::endl;
+
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        std::printf("- %s: %s%.3f [%s]", VARIABLE_INFO[i].name, std::string(w - iwidth(variables[i]), ' ').c_str(), variables[i], VARIABLE_INFO[i].units);
+
+        auto expectedValue = expectedValues.find(VARIABLE_INFO[i].name);
+
+        if (expectedValue != expectedValues.end()) {
+            if (areNearlyEqual(variables[i], expectedValue->second)) {
+                std::cout << " |  OK";
+            } else {
+                std::printf(" | NOK | %s%.3f", std::string(ew - iwidth(expectedValue->second), ' ').c_str(), expectedValue->second);
+            }
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << "---------------------------------------[" << title << "][END]" << std::endl;
+}
+
 int main()
 {
-    // Some information about the model.
+    // Some information about our model.
 
     printInformation();
 
-    // Create the array of variables needed to compute the model.
+    // Create our array of variables.
 
     double *variables = createVariablesArray();
 
-    // Initialise our variables, compute our computed constants, and output our model variables.
+    // Initialise our variables, compute our computed constants, and output the initial value/guess of our variables.
 
     initialiseVariables(variables);
     computeComputedConstants(variables);
 
-    printVariableValues("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@);
+    printValues("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@);
 
     // Compute our variables.
 
     computeVariables(variables);
 
-    // Output the final value of our model variables.
+    // Output the final value of our variables.
 
-    printVariableValues("Final variable values", variables, @FINAL_VARIABLE_VALUES@);
+    printValues("Final variable values", variables, @FINAL_VARIABLE_VALUES@);
 
     // Clean up after ourselves.
 

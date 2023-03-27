@@ -1,0 +1,219 @@
+#include "common.h"
+
+extern "C" {
+#include "model.h"
+}
+
+#include <cvode/cvode.h>
+#include <nvector/nvector_serial.h>
+#include <sunlinsol/sunlinsol_dense.h>
+
+#include <iostream>
+
+std::string variableType(VariableType variableType)
+{
+    std::string res;
+
+    switch (variableType) {
+    case VARIABLE_OF_INTEGRATION:
+        res = "variable of integration";
+
+        break;
+    case STATE:
+        res = "state";
+
+        break;
+    case CONSTANT:
+        res = "constant";
+
+        break;
+    case COMPUTED_CONSTANT:
+        res = "computed constant";
+
+        break;
+    default: // ALGEBRAIC.
+        res = "algebraic";
+
+        break;
+    }
+
+    return res;
+}
+
+void printInformation()
+{
+    std::cout << "---------------------------------------[Information][BEGIN]" << std::endl;
+    std::cout << "- Generator version: " << VERSION << std::endl;
+    std::cout << "- libCellML version: " << LIBCELLML_VERSION << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Variable of integration:" << std::endl;
+    std::cout << "   - " << VOI_INFO.name << " [" << VOI_INFO.units << "]:" << std::endl;
+    std::cout << "      - Type: " << variableType(VOI_INFO.type) << std::endl;
+    std::cout << "      - Component: " << VOI_INFO.component << std::endl;
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of states: " << STATE_COUNT << std::endl;
+    std::cout << "- States:" << std::endl;
+
+    for (size_t i = 0; i < STATE_COUNT; ++i) {
+        std::cout << "   - " << STATE_INFO[i].name << " [" << STATE_INFO[i].units << "]:" << std::endl;
+        std::cout << "      - Type: " << variableType(STATE_INFO[i].type) << std::endl;
+        std::cout << "      - Component: " << STATE_INFO[i].component << std::endl;
+    }
+
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of variables: " << VARIABLE_COUNT << std::endl;
+    std::cout << "- Variables:" << std::endl;
+
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        std::cout << "   - " << VARIABLE_INFO[i].name << " [" << VARIABLE_INFO[i].units << "]:" << std::endl;
+        std::cout << "      - Type: " << variableType(VARIABLE_INFO[i].type) << std::endl;
+        std::cout << "      - Component: " << VARIABLE_INFO[i].component << std::endl;
+    }
+
+    std::cout << "---------------------------------------[Information][END]" << std::endl;
+}
+
+void printValues(double voi, const double *states, const double *variables)
+{
+    if (areNearlyEqual(voi, 0.0)) {
+        std::cout << "voi";
+
+        for (size_t i = 0; i < STATE_COUNT; ++i) {
+            std::cout << "," << STATE_INFO[i].name;
+        }
+
+        for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+            std::cout << "," << VARIABLE_INFO[i].name;
+        }
+
+        std::cout << std::endl;
+    }
+
+    std::cout << voi;
+
+    for (size_t i = 0; i < STATE_COUNT; ++i) {
+        std::cout << "," << states[i];
+    }
+
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        std::cout << "," << variables[i];
+    }
+
+    std::cout << std::endl;
+}
+
+typedef struct {
+    void (*computeRates)(double, double *, double *, double *);
+
+    double *variables;
+} UserOdeData;
+
+int func(double voi, N_Vector y, N_Vector yDot, void *userData)
+{
+    UserOdeData *realUserData = (UserOdeData *) userData;
+
+    realUserData->computeRates(voi, N_VGetArrayPointer_Serial(y), N_VGetArrayPointer_Serial(yDot), realUserData->variables);
+
+    return 0;
+}
+
+int main()
+{
+    // Some information about the model.
+
+    printInformation();
+
+    // Create our various arrays.
+
+    double voi = 0.0;
+    double *states = createStatesArray();
+    double *rates = createStatesArray();
+    double *variables = createVariablesArray();
+
+    // Initialise our states and variables, and compute our computed constants, and output the initial value/guess of our states and variables.
+
+    initialiseVariables(states, variables);
+    computeComputedConstants(variables);
+
+    std::cout << std::endl;
+    std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;
+
+    printValues(voi, states, variables);
+
+    // Create our SUNDIALS context.
+
+    SUNContext context;
+
+    SUNContext_Create(NULL, &context);
+
+    // Create our CVODE solver.
+
+    void *solver = CVodeCreate(CV_BDF, context);
+
+    // Initialise our CVODE solver.
+
+    N_Vector y = N_VMake_Serial(STATE_COUNT, states, context);
+
+    CVodeInit(solver, func, voi, y);
+
+    // Set our user data.
+
+    UserOdeData userData = { computeRates, variables };
+
+    CVodeSetUserData(solver, &userData);
+
+    // Set our maximum step.
+
+    CVodeSetMaxStep(solver, @MAXIMUM_STEP@);
+
+    // Set our maximum number of steps.
+
+    CVodeSetMaxNumSteps(solver, 99999);
+
+    // Set our linear solver.
+
+    SUNMatrix matrix = SUNDenseMatrix(STATE_COUNT, STATE_COUNT, context);
+    SUNLinearSolver linearSolver = SUNLinSol_Dense(y, matrix, context);
+
+    CVodeSetLinearSolver(solver, linearSolver, matrix);
+
+    // Set our relative and absolute tolerances.
+
+    CVodeSStolerances(solver, @RELATIVE_TOLERANCE@, @ABSOLUTE_TOLERANCE@);
+
+    // Run our model.
+
+    size_t i = 0;
+    double voiMax = @ENDING_POINT@;
+    double voiInterval = @POINT_INTERVAL@;
+
+    do {
+        // Integrate our model.
+
+        CVode(solver, ++i * voiInterval, y, &voi, CV_NORMAL);
+
+        // Compute our variables.
+
+        computeVariables(voi, states, rates, variables);
+
+        // Output the value of our states and variables.
+
+        printValues(voi, states, variables);
+    } while (voi < voiMax);
+
+    std::cout << "---------------------------------------[Values][END]" << std::endl;
+
+    // Clean up after ourselves.
+
+    SUNLinSolFree(linearSolver);
+    SUNMatDestroy(matrix);
+    N_VDestroy_Serial(y);
+    CVodeFree(&solver);
+    SUNContext_Free(&context);
+
+    deleteArray(states);
+    deleteArray(rates);
+    deleteArray(variables);
+
+    return 0;
+}
