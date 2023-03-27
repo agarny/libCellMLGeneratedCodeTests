@@ -1,4 +1,10 @@
-#include "algebraicmodel.h"
+#include "common.h"
+
+extern "C" {
+#include "model.h"
+}
+
+#include <iostream>
 
 std::string variableType(VariableType variableType)
 {
@@ -38,4 +44,36 @@ void printInformation()
     }
 
     std::cout << "---------------------------------------[Information][END]" << std::endl;
+}
+
+int main()
+{
+    // Some information about the model.
+
+    printInformation();
+
+    // Create the array of variables needed to compute the model.
+
+    double *variables = createVariablesArray();
+
+    // Initialise our variables, compute our computed constants, and output our model variables.
+
+    initialiseVariables(variables);
+    computeComputedConstants(variables);
+
+    printVariableValues("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@);
+
+    // Compute our variables.
+
+    computeVariables(variables);
+
+    // Output the final value of our model variables.
+
+    printVariableValues("Final variable values", variables, @FINAL_VARIABLE_VALUES@);
+
+    // Clean up after ourselves.
+
+    deleteArray(variables);
+
+    return 0;
 }
