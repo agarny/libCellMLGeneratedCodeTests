@@ -1,6 +1,9 @@
 #include "algebraicmodel.h"
 #include "common.h"
+
+extern "C" {
 #include "model.h"
+}
 
 int main()
 {
@@ -17,7 +20,7 @@ int main()
     initialiseVariables(variables);
 
     printVariableValues("Initial variable values/guesses", variables,
-                        "'b' and 'c' have an initial guess of 1.");
+                        "'a' has an initial guess of 1.");
 
     // Compute our model by first computing our computed constants (in case
     // there are some) and then our variables.
@@ -25,10 +28,10 @@ int main()
     computeComputedConstants(variables);
     computeVariables(variables);
 
-    // Output and check the final value of our model variables.
+    // Output the final value of our model variables.
 
     printVariableValues("Final variable values", variables,
-                        "'a', 'b', 'b', 'd', 'x', and 'y' should have a value of 14, 4, 7, 11, 3, and 5, respectively.");
+                        "'a' should have a value of 9.");
 
     // Clean up after ourselves.
 

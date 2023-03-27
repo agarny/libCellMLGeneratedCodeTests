@@ -1,5 +1,9 @@
+extern "C" {
 #include "model.h"
+}
 
-char * variableType(VariableType variableType);
+#include <iostream>
+
+std::string variableType(VariableType variableType);
 
 void printInformation();

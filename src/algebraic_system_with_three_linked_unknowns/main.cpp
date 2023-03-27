@@ -1,6 +1,9 @@
 #include "algebraicmodel.h"
 #include "common.h"
+
+extern "C" {
 #include "model.h"
+}
 
 int main()
 {

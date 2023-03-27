@@ -1,10 +1,12 @@
+#include "common.h"
+
+extern "C" {
 #include "model.h"
+}
 
 #include <kinsol/kinsol.h>
 #include <nvector/nvector_serial.h>
 #include <sunlinsol/sunlinsol_dense.h>
-
-#include <stdio.h>
 
 typedef struct {
     void (*objectiveFunction)(double *, double *, void *);
@@ -69,15 +71,15 @@ void nlaSolve(void (*objectiveFunction)(double *, double *, void *), double *u, 
     SUNContext_Free(&context);
 }
 
-void printVariableValues(char *title, double *variables, char *note)
+void printVariableValues(const std::string &title, const double *variables, const std::string &note)
 {
-    printf("\n---------------------------------------[%s][BEGIN]\n", title);
+    std::cout << std::endl << "---------------------------------------[" << title << "][BEGIN]" << std::endl;
 
     for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        printf("- %s: %f [%s]\n", VARIABLE_INFO[i].name, variables[i], VARIABLE_INFO[i].units);
+        std::cout << "- " << VARIABLE_INFO[i].name << ": " << variables[i] << " [" << VARIABLE_INFO[i].units << "]" << std::endl;
     }
 
-    printf("---------------------------------------\n");
-    printf("Note: %s\n", note);
-    printf("---------------------------------------[%s][END]\n", title);
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "Note: " << note << std::endl;
+    std::cout << "---------------------------------------[" << title << "][END]" << std::endl;
 }

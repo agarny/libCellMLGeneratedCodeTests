@@ -2,10 +2,10 @@ function(build_executable EXECUTABLE)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
     add_executable(${EXECUTABLE}
-        ../algebraicmodel.c
-        ../common.c
+        ../algebraicmodel.cpp
+        ../common.cpp
 
-        main.c
+        main.cpp
         model.c
     )
 

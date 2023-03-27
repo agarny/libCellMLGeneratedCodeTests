@@ -1,6 +1,9 @@
 #include "algebraicmodel.h"
 #include "common.h"
+
+extern "C" {
 #include "model.h"
+}
 
 int main()
 {
@@ -25,7 +28,7 @@ int main()
     computeComputedConstants(variables);
     computeVariables(variables);
 
-    // Output the final value of our model variables.
+    // Output and check the final value of our model variables.
 
     printVariableValues("Final variable values", variables,
                         "'a', 'b', 'b', 'd', 'x', and 'y' should have a value of 14, 4, 7, 11, 3, and 5, respectively.");
