@@ -51,6 +51,10 @@ void nlaSolve(void (*objectiveFunction)(double *, double *, void *), double *u, 
 
     KINSetUserData(solver, &userData);
 
+    // Set our maximum number of steps.
+
+    KINSetMaxNewtonStep(solver, 99999);
+
     // Set our linear solver.
 
     SUNMatrix matrix = SUNDenseMatrix(n, n, context);
