@@ -4,30 +4,57 @@ function(build_executable EXECUTABLE TYPE)
     set(MAIN_CPP ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
 
     if("${TYPE}" STREQUAL "ODE")
-        list(LENGTH ARGN ARGN_COUNT)
+        set(ONE_VALUE_KEYWORDS
+            ENDING_POINT
+            POINT_INTERVAL
+            OUTPUT_POINTS
+            RELATIVE_TOLERANCE
+            ABSOLUTE_TOLERANCE
+        )
 
-        if(ARGN_COUNT EQUAL 5)
-            list(GET ARGN 0 ENDING_POINT)
-            list(GET ARGN 1 POINT_INTERVAL)
-            list(GET ARGN 2 MAXIMUM_STEP)
-            list(GET ARGN 3 RELATIVE_TOLERANCE)
-            list(GET ARGN 4 ABSOLUTE_TOLERANCE)
+        cmake_parse_arguments(ARG "" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
 
-            configure_file(../main.ode.cpp.in ${MAIN_CPP})
+        if("${ARG_ENDING_POINT}" STREQUAL "")
+            set(ARG_ENDING_POINT 1000.0)
+        endif()
+
+        if("${ARG_POINT_INTERVAL}" STREQUAL "")
+            set(ARG_POINT_INTERVAL 1.0)
+        endif()
+
+        if("${ARG_OUTPUT_POINTS}" STREQUAL "")
+            set(ARG_USE_OUTPUT_POINTS false)
+            set(ARG_OUTPUT_POINTS "{}")
         else()
-            message(FATAL_ERROR "The `ODE` type requires an ending point, a point interval, a maximum step, a relative tolerance, and an absolute tolerance.")
-        endif ()
+            set(ARG_USE_OUTPUT_POINTS true)
+        endif()
+
+        if("${ARG_RELATIVE_TOLERANCE}" STREQUAL "")
+            set(ARG_RELATIVE_TOLERANCE 1.0e-7)
+        endif()
+
+        if("${ARG_ABSOLUTE_TOLERANCE}" STREQUAL "")
+            set(ARG_ABSOLUTE_TOLERANCE 1.0e-7)
+        endif()
+
+        configure_file(../main.ode.cpp.in ${MAIN_CPP})
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")
-        list(LENGTH ARGN ARGN_COUNT)
+        set(ONE_VALUE_KEYWORDS
+            INITIAL_VARIABLE_VALUES_GUESSES
+            FINAL_VARIABLE_VALUES
+        )
 
-        if(ARGN_COUNT EQUAL 2)
-            list(GET ARGN 0 INITIAL_VARIABLE_VALUES_GUESSES)
-            list(GET ARGN 1 FINAL_VARIABLE_VALUES)
+        cmake_parse_arguments(ARG "" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
 
-            configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
-        else()
-            message(FATAL_ERROR "The `ALGEBRAIC` type requires some initial variable values/guesses and some final variable values.")
-        endif ()
+        if("${ARG_INITIAL_VARIABLE_VALUES_GUESSES}" STREQUAL "")
+            set(ARG_INITIAL_VARIABLE_VALUES_GUESSES "{}")
+        endif()
+
+        if("${ARG_FINAL_VARIABLE_VALUES}" STREQUAL "")
+            set(ARG_FINAL_VARIABLE_VALUES "{}")
+        endif()
+
+        configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
     else()
         message(FATAL_ERROR "The type of the executable must be either `ODE` or `ALGEBRAIC`.")
     endif()

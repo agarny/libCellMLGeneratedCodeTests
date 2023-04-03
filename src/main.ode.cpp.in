@@ -162,10 +162,6 @@ int main()
 
     CVodeSetUserData(solver, &userData);
 
-    // Set our maximum step.
-
-    CVodeSetMaxStep(solver, @MAXIMUM_STEP@);
-
     // Set our maximum number of steps.
 
     CVodeSetMaxNumSteps(solver, 99999);
@@ -179,18 +175,28 @@ int main()
 
     // Set our relative and absolute tolerances.
 
-    CVodeSStolerances(solver, @RELATIVE_TOLERANCE@, @ABSOLUTE_TOLERANCE@);
+    CVodeSStolerances(solver, @ARG_RELATIVE_TOLERANCE@, @ARG_ABSOLUTE_TOLERANCE@);
 
     // Run our model.
 
-    size_t i = 0;
-    double voiMax = @ENDING_POINT@;
-    double voiInterval = @POINT_INTERVAL@;
+    std::vector<double> outputPoints = @ARG_OUTPUT_POINTS@;
 
-    do {
+    if (!@ARG_USE_OUTPUT_POINTS@) {
+        size_t i = 0;
+        double voiMax = @ARG_ENDING_POINT@;
+        double voiInterval = @ARG_POINT_INTERVAL@;
+
+        do {
+            voi = ++i * voiInterval;
+
+            outputPoints.push_back(voi);
+        } while (voi < voiMax);
+    }
+
+    for (const auto &outputPoint : outputPoints) {
         // Integrate our model.
 
-        CVode(solver, ++i * voiInterval, y, &voi, CV_NORMAL);
+        CVode(solver, outputPoint, y, &voi, CV_NORMAL);
 
         // Compute our variables.
 
@@ -199,7 +205,7 @@ int main()
         // Output the value of our states and variables.
 
         printValues(voi, states, variables);
-    } while (voi < voiMax);
+    }
 
     std::cout << "---------------------------------------[Values][END]" << std::endl;
 
