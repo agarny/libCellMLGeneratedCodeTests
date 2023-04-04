@@ -73,22 +73,23 @@ void printInformation()
     std::cout << "---------------------------------------[Information][END]" << std::endl;
 }
 
-void printValues(double voi, const double *states, const double *variables)
+void printHeaders()
 {
-    if (areNearlyEqual(voi, 0.0)) {
-        std::cout << "voi";
+    std::cout << "voi";
 
-        for (size_t i = 0; i < STATE_COUNT; ++i) {
-            std::cout << "," << STATE_INFO[i].name;
-        }
-
-        for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-            std::cout << "," << VARIABLE_INFO[i].name;
-        }
-
-        std::cout << std::endl;
+    for (size_t i = 0; i < STATE_COUNT; ++i) {
+        std::cout << "," << STATE_INFO[i].name;
     }
 
+    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
+        std::cout << "," << VARIABLE_INFO[i].name;
+    }
+
+    std::cout << std::endl;
+}
+
+void printValues(double voi, const double *states, const double *variables)
+{
     std::cout << voi;
 
     for (size_t i = 0; i < STATE_COUNT; ++i) {
@@ -138,7 +139,11 @@ int main()
     std::cout << std::endl;
     std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;
 
-    printValues(voi, states, variables);
+    printHeaders();
+
+    if (!@ARG_SKIP_FIRST_OUTPUT_POINT@) {
+        printValues(voi, states, variables);
+    }
 
     // Create our SUNDIALS context.
 

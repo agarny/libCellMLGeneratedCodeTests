@@ -4,6 +4,9 @@ function(build_executable EXECUTABLE TYPE)
     set(MAIN_CPP ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
 
     if("${TYPE}" STREQUAL "ODE")
+        set(OPTIONS
+            SKIP_FIRST_OUTPUT_POINT
+        )
         set(ONE_VALUE_KEYWORDS
             ENDING_POINT
             POINT_INTERVAL
@@ -12,7 +15,7 @@ function(build_executable EXECUTABLE TYPE)
             ABSOLUTE_TOLERANCE
         )
 
-        cmake_parse_arguments(ARG "" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
+        cmake_parse_arguments(ARG "${OPTIONS}" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
 
         if("${ARG_ENDING_POINT}" STREQUAL "")
             set(ARG_ENDING_POINT 1000.0)
@@ -27,6 +30,12 @@ function(build_executable EXECUTABLE TYPE)
             set(ARG_OUTPUT_POINTS "{}")
         else()
             set(ARG_USE_OUTPUT_POINTS true)
+        endif()
+
+        if(ARG_SKIP_FIRST_OUTPUT_POINT)
+            set(ARG_SKIP_FIRST_OUTPUT_POINT true)
+        else()
+            set(ARG_SKIP_FIRST_OUTPUT_POINT false)
         endif()
 
         if("${ARG_RELATIVE_TOLERANCE}" STREQUAL "")
