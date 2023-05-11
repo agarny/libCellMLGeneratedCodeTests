@@ -10,6 +10,8 @@ find_package(SUNDIALS REQUIRED cvode kinsol)
 
 include_directories(.)
 
+configure_file(common.py ${CMAKE_BINARY_DIR}/common.py)
+
 add_subdirectory(algebraic_eqn_with_one_non_isolated_unknown)
 add_subdirectory(algebraic_system_with_three_linked_unknowns)
 add_subdirectory(algebraic_system_with_various_dependencies_not_ordered)

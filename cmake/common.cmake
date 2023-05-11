@@ -2,6 +2,7 @@ function(build_executable EXECUTABLE TYPE)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
     set(MAIN_CPP ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
+    set(MAIN_PY ${CMAKE_BINARY_DIR}/${EXECUTABLE}.py)
 
     if("${TYPE}" STREQUAL "ODE")
         set(OPTIONS
@@ -49,6 +50,7 @@ function(build_executable EXECUTABLE TYPE)
         endif()
 
         configure_file(../main.ode.cpp.in ${MAIN_CPP})
+        configure_file(../main.ode.py.in ${MAIN_PY})
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")
         set(ONE_VALUE_KEYWORDS
             INITIAL_VARIABLE_VALUES_GUESSES
@@ -74,6 +76,7 @@ function(build_executable EXECUTABLE TYPE)
         set(ARG_FINAL_VARIABLE_VALUES_PYTHON "{${ARG_FINAL_VARIABLE_VALUES}}")
 
         configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
+        configure_file(../main.algebraic.py.in ${MAIN_PY})
     else()
         message(FATAL_ERROR "The type of the executable must be either `ODE` or `ALGEBRAIC`.")
     endif()
