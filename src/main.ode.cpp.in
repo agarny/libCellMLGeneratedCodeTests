@@ -184,7 +184,7 @@ int main()
 
     // Run our model.
 
-    std::vector<double> outputPoints = @ARG_OUTPUT_POINTS@;
+    std::vector<double> outputPoints = @ARG_OUTPUT_POINTS_CPP@;
 
     if (!@ARG_USE_OUTPUT_POINTS@) {
         size_t i = 0;
