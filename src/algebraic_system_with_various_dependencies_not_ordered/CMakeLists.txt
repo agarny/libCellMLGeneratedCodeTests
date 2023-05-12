@@ -1,4 +1,4 @@
-build_executable(algebraicSystemWithVariousDependenciesNotOrdered
+build_executable(algebraic_system_with_various_dependencies_not_ordered
     ALGEBRAIC
     INITIAL_VARIABLE_VALUES_GUESSES
         "{{\"a\", 14.0}, {\"b\", 1.0}, {\"c\", 1.0}, {\"d\", 0.0}, {\"x\", 3.0}, {\"y\", 5.0}}"
