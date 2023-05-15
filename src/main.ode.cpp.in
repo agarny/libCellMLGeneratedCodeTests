@@ -131,7 +131,8 @@ int main()
     double *rates = createStatesArray();
     double *variables = createVariablesArray();
 
-    // Initialise our states and variables, and compute our computed constants, and output the initial value/guess of our states and variables.
+    // Initialise our states and variables, and compute our computed constants, and output the initial value/guess of
+    // our states and variables.
 
     initialiseVariables(states, variables);
     computeComputedConstants(variables);

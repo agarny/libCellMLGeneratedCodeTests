@@ -48,7 +48,8 @@ def print_values(title, variables, expected_values):
         if ecw > ew:
             ew = ecw
 
-    print(f"\n---------------------------------------[{title}][BEGIN]")
+    print("")
+    print(f"---------------------------------------[{title}][BEGIN]")
 
     for i in range(0, model.VARIABLE_COUNT):
         print(f"- {model.VARIABLE_INFO[i]['name']}: {int(w - common.iwidth(variables[i])) * ' '}{variables[i] :.3f} [{model.VARIABLE_INFO[i]['units']}]", end='');
