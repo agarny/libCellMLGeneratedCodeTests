@@ -1,4 +1,5 @@
 import importlib.util
+from scipy.integrate import solve_ivp
 
 
 def variable_type(type):
@@ -46,9 +47,35 @@ def print_information(model):
     print("---------------------------------------[Information][END]")
 
 
+def print_headers():
+    print("voi", end="")
+
+    for i in range(0, model.STATE_COUNT):
+        print(f",{model.STATE_INFO[i]['name']}", end="")
+
+    for i in range(0, model.VARIABLE_COUNT):
+        print(f",{model.VARIABLE_INFO[i]['name']}", end="")
+
+    print("")
+
+
+def print_values(voi, states, variables):
+    print(voi, end="")
+
+    for i in range(0, model.STATE_COUNT):
+        print(f",{states[i]}", end="")
+
+    for i in range(0, model.VARIABLE_COUNT):
+        print(f",{variables[i]}", end="")
+
+    print("")
+
+
 # Load our model.
 
-spec = importlib.util.spec_from_file_location("model", "${CMAKE_SOURCE_DIR}/src/@EXECUTABLE@/model.py")
+spec = importlib.util.spec_from_file_location(
+    "model", "${CMAKE_SOURCE_DIR}/src/@EXECUTABLE@/model.py"
+)
 model = importlib.util.module_from_spec(spec)
 
 spec.loader.exec_module(model)
@@ -56,3 +83,69 @@ spec.loader.exec_module(model)
 # Some information about the model.
 
 print_information(model)
+
+# Create our various arrays.
+
+voi = 0.0
+states = model.create_states_array()
+rates = model.create_states_array()
+variables = model.create_variables_array()
+
+# Initialise our states and variables, and compute our computed constants, and output the initial value/guess of our
+# states and variables.
+
+model.initialise_variables(states, variables)
+model.compute_computed_constants(variables)
+
+print("")
+print("---------------------------------------[Values][BEGIN]")
+
+print_headers()
+
+if not @SKIP_FIRST_OUTPUT_POINT@:
+    print_values(voi, states, variables)
+
+# Run our model.
+
+output_points = @OUTPUT_POINTS@
+
+if not @USE_OUTPUT_POINTS@:
+    i = 0
+    voi_max = @ENDING_POINT@
+    voi_interval = @POINT_INTERVAL@
+
+    while True:
+        i += 1
+        voi = i * voi_interval
+
+        output_points.append(voi)
+
+        if voi >= voi_max:
+            break
+
+voi = 0.0
+
+for output_point in output_points:
+    def func(t, y, rates, variables):
+        model.compute_rates(t, y, rates, variables, )
+
+        return rates
+
+    # Integrate our model.
+
+    res = solve_ivp(func, (voi, output_point), states, args=(rates, variables), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
+    states = res.y[:, -1]
+
+    # break
+
+    voi = output_point
+
+    # Compute our variables.
+
+    model.compute_variables(voi, states, rates, variables)
+
+    # Output the value of our states and variables.
+
+    print_values(voi, states, variables)
+
+print("---------------------------------------[Values][END]")
