@@ -127,5 +127,5 @@ int iwidth(double n)
         return 1;
     }
 
-    return int(n < 0.0) + log10(fabs(trunc(n))) + 1;
+    return int(n < 0.0) + log10(fabs(round(n))) + 1;
 }
