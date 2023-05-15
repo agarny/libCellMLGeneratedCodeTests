@@ -44,7 +44,7 @@ def find_root_0(variables):
 
     u[0] = variables[3]
 
-    nla_solve(objective_function_0, u, 1, (variables))
+    u = nla_solve(objective_function_0, u, 1, [variables])
 
     variables[3] = u[0]
 

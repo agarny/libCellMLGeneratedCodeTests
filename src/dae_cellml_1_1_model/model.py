@@ -67,7 +67,7 @@ def find_root_0(voi, states, rates, variables):
 
     u[0] = variables[0]
 
-    nla_solve(objective_function_0, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_0, u, 1, [voi, states, rates, variables])
 
     variables[0] = u[0]
 
@@ -88,7 +88,7 @@ def find_root_1(voi, states, rates, variables):
 
     u[0] = variables[6]
 
-    nla_solve(objective_function_1, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_1, u, 1, [voi, states, rates, variables])
 
     variables[6] = u[0]
 

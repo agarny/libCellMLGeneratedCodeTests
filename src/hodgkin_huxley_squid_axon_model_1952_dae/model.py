@@ -89,7 +89,7 @@ def find_root_0(voi, states, rates, variables):
 
     u[0] = variables[0]
 
-    nla_solve(objective_function_0, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_0, u, 1, [voi, states, rates, variables])
 
     variables[0] = u[0]
 
@@ -110,7 +110,7 @@ def find_root_1(voi, states, rates, variables):
 
     u[0] = variables[6]
 
-    nla_solve(objective_function_1, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_1, u, 1, [voi, states, rates, variables])
 
     variables[6] = u[0]
 
@@ -131,7 +131,7 @@ def find_root_2(voi, states, rates, variables):
 
     u[0] = variables[1]
 
-    nla_solve(objective_function_2, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_2, u, 1, [voi, states, rates, variables])
 
     variables[1] = u[0]
 
@@ -152,7 +152,7 @@ def find_root_3(voi, states, rates, variables):
 
     u[0] = variables[8]
 
-    nla_solve(objective_function_3, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_3, u, 1, [voi, states, rates, variables])
 
     variables[8] = u[0]
 
@@ -173,7 +173,7 @@ def find_root_4(voi, states, rates, variables):
 
     u[0] = variables[3]
 
-    nla_solve(objective_function_4, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_4, u, 1, [voi, states, rates, variables])
 
     variables[3] = u[0]
 
@@ -194,7 +194,7 @@ def find_root_5(voi, states, rates, variables):
 
     u[0] = variables[10]
 
-    nla_solve(objective_function_5, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_5, u, 1, [voi, states, rates, variables])
 
     variables[10] = u[0]
 
@@ -215,7 +215,7 @@ def find_root_6(voi, states, rates, variables):
 
     u[0] = variables[11]
 
-    nla_solve(objective_function_6, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_6, u, 1, [voi, states, rates, variables])
 
     variables[11] = u[0]
 
@@ -236,7 +236,7 @@ def find_root_7(voi, states, rates, variables):
 
     u[0] = variables[12]
 
-    nla_solve(objective_function_7, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_7, u, 1, [voi, states, rates, variables])
 
     variables[12] = u[0]
 
@@ -257,7 +257,7 @@ def find_root_8(voi, states, rates, variables):
 
     u[0] = variables[13]
 
-    nla_solve(objective_function_8, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_8, u, 1, [voi, states, rates, variables])
 
     variables[13] = u[0]
 
@@ -278,7 +278,7 @@ def find_root_9(voi, states, rates, variables):
 
     u[0] = variables[14]
 
-    nla_solve(objective_function_9, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_9, u, 1, [voi, states, rates, variables])
 
     variables[14] = u[0]
 
@@ -299,7 +299,7 @@ def find_root_10(voi, states, rates, variables):
 
     u[0] = variables[2]
 
-    nla_solve(objective_function_10, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_10, u, 1, [voi, states, rates, variables])
 
     variables[2] = u[0]
 
@@ -320,7 +320,7 @@ def find_root_11(voi, states, rates, variables):
 
     u[0] = variables[16]
 
-    nla_solve(objective_function_11, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_11, u, 1, [voi, states, rates, variables])
 
     variables[16] = u[0]
 
@@ -341,7 +341,7 @@ def find_root_12(voi, states, rates, variables):
 
     u[0] = variables[17]
 
-    nla_solve(objective_function_12, u, 1, (voi, states, rates, variables))
+    u = nla_solve(objective_function_12, u, 1, [voi, states, rates, variables])
 
     variables[17] = u[0]
 

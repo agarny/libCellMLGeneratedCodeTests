@@ -1,8 +1,17 @@
 import math
+from scipy.optimize import fsolve
 
 
 def nla_solve(objective_function, u, n, data):
-    pass
+    def func(u):
+        f = [0.0] * n
+
+        objective_function(u, f, data)
+
+        return f
+
+    return fsolve(func, u)
+
 
 def iwidth(n):
     if math.isclose(n, 0.0):
