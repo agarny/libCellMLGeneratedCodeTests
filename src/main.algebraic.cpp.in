@@ -107,7 +107,7 @@ int main()
     initialiseVariables(variables);
     computeComputedConstants(variables);
 
-    printValues("Initial variable values/guesses", variables, @ARG_INITIAL_VARIABLE_VALUES_GUESSES_CPP@);
+    printValues("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@);
 
     // Compute our variables.
 
@@ -115,7 +115,7 @@ int main()
 
     // Output the final value of our variables.
 
-    printValues("Final variable values", variables, @ARG_FINAL_VARIABLE_VALUES_CPP@);
+    printValues("Final variable values", variables, @FINAL_VARIABLE_VALUES@);
 
     // Clean up after ourselves.
 

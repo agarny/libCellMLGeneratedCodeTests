@@ -142,7 +142,7 @@ int main()
 
     printHeaders();
 
-    if (!@ARG_SKIP_FIRST_OUTPUT_POINT@) {
+    if (!@SKIP_FIRST_OUTPUT_POINT@) {
         printValues(voi, states, variables);
     }
 
@@ -181,16 +181,16 @@ int main()
 
     // Set our relative and absolute tolerances.
 
-    CVodeSStolerances(solver, @ARG_RELATIVE_TOLERANCE@, @ARG_ABSOLUTE_TOLERANCE@);
+    CVodeSStolerances(solver, @RELATIVE_TOLERANCE@, @ABSOLUTE_TOLERANCE@);
 
     // Run our model.
 
-    std::vector<double> outputPoints = @ARG_OUTPUT_POINTS_CPP@;
+    std::vector<double> outputPoints = @OUTPUT_POINTS@;
 
-    if (!@ARG_USE_OUTPUT_POINTS@) {
+    if (!@USE_OUTPUT_POINTS@) {
         size_t i = 0;
-        double voiMax = @ARG_ENDING_POINT@;
-        double voiInterval = @ARG_POINT_INTERVAL@;
+        double voiMax = @ENDING_POINT@;
+        double voiInterval = @POINT_INTERVAL@;
 
         do {
             voi = ++i * voiInterval;

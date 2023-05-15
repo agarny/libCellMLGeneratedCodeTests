@@ -86,7 +86,7 @@ variables = model.create_variables_array()
 model.initialise_variables(variables)
 model.compute_computed_constants(variables)
 
-print_values("Initial variable values/guesses", variables, @ARG_INITIAL_VARIABLE_VALUES_GUESSES_PYTHON@)
+print_values("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@)
 
 # Compute our variables.
 
@@ -94,4 +94,4 @@ model.compute_variables(variables)
 
 # Output the final value of our variables.
 
-print_values("Final variable values", variables, @ARG_FINAL_VARIABLE_VALUES_PYTHON@)
+print_values("Final variable values", variables, @FINAL_VARIABLE_VALUES@)
