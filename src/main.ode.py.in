@@ -96,6 +96,8 @@ variables = model.create_variables_array()
 
 model.initialise_variables(states, variables)
 model.compute_computed_constants(variables)
+model.compute_rates(voi, states, rates, variables)
+model.compute_variables(voi, states, rates, variables)
 
 print("")
 print("---------------------------------------[Values][BEGIN]")

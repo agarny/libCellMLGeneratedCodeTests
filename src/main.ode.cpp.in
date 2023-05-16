@@ -136,6 +136,8 @@ int main()
 
     initialiseVariables(states, variables);
     computeComputedConstants(variables);
+    computeRates(voi, states, rates, variables);
+    computeVariables(voi, states, rates, variables);
 
     std::cout << std::endl;
     std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;

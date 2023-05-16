@@ -4,7 +4,7 @@ from scipy.optimize import fsolve
 
 def nla_solve(objective_function, u, n, data):
     def func(u):
-        f = [0.0] * n
+        f = [math.nan] * n
 
         objective_function(u, f, data)
 
