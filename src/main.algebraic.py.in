@@ -52,12 +52,12 @@ def print_values(title, variables, expected_values):
     print(f"---------------------------------------[{title}][BEGIN]")
 
     for i in range(0, model.VARIABLE_COUNT):
-        print(f"- {model.VARIABLE_INFO[i]['name']}: {int(w - common.iwidth(variables[i])) * ' '}{variables[i] :.3f} [{model.VARIABLE_INFO[i]['units']}]", end='');
+        print(f"- {model.VARIABLE_INFO[i]['name']}: {int(w + math.isnan(variables[i]) * 4 - common.iwidth(variables[i])) * ' '}{variables[i] :.3f} [{model.VARIABLE_INFO[i]['units']}]", end='');
 
         try:
             expected_value = expected_values[model.VARIABLE_INFO[i]['name']];
 
-            if math.isclose(variables[i], expected_value):
+            if common.area_nearly_equal(variables[i], expected_value):
                 print(" |  OK")
             else:
                 print(f" | NOK | {int(ew - common.iwidth(expected_value)) * ' '}{expected_value :.3f}")

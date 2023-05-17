@@ -62,7 +62,7 @@ void printValues(const std::string &title, const double *variables, const std::m
     auto ev = expectedValues.begin();
 
     for (size_t i = 0; i < expectedValues.size(); ++i) {
-        auto ecw = iwidth((*ev).second);
+        auto ecw = iwidth(ev->second);
 
         if (ecw > ew) {
             ew = ecw;
@@ -74,7 +74,7 @@ void printValues(const std::string &title, const double *variables, const std::m
     std::cout << std::endl << "---------------------------------------[" << title << "][BEGIN]" << std::endl;
 
     for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        std::printf("- %s: %s%.3f [%s]", VARIABLE_INFO[i].name, std::string(w - iwidth(variables[i]), ' ').c_str(), variables[i], VARIABLE_INFO[i].units);
+        std::printf("- %s: %s%.3f [%s]", VARIABLE_INFO[i].name, std::string(w + isnan(variables[i]) * 4 - iwidth(variables[i]), ' ').c_str(), variables[i], VARIABLE_INFO[i].units);
 
         auto expectedValue = expectedValues.find(VARIABLE_INFO[i].name);
 

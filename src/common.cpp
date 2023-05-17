@@ -107,6 +107,10 @@ uint64_t ulpsDistance(double a, double b)
 
 bool areNearlyEqual(double a, double b)
 {
+    if (isnan(a) && isnan(b)) {
+        return true;
+    }
+
     static const double EPSILON = std::numeric_limits<double>::epsilon();
     static const ptrdiff_t ULPS_EPSILON = 1;
 
@@ -125,6 +129,10 @@ int iwidth(double n)
 {
     if (areNearlyEqual(n, 0.0)) {
         return 1;
+    }
+
+    if (isnan(n)) {
+        return 3;
     }
 
     return int(n < 0.0) + log10(fabs(round(n))) + 1;
