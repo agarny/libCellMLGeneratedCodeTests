@@ -134,7 +134,7 @@ int main()
     // Initialise our states and variables, and compute our computed constants, and output the initial value/guess of
     // our states and variables.
 
-    initialiseVariables(states, variables);
+    initialiseVariables(states, rates, variables);
     computeComputedConstants(variables);
     computeRates(voi, states, rates, variables);
     computeVariables(voi, states, rates, variables);

@@ -53,7 +53,7 @@ void nlaSolve(void (*objectiveFunction)(double *, double *, void *), double *u, 
 
     // Set our maximum number of steps.
 
-    KINSetMaxNewtonStep(solver, 99999);
+    KINSetMaxNewtonStep(solver, 9999999);
 
     // Set our linear solver.
 

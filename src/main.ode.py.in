@@ -94,7 +94,7 @@ variables = model.create_variables_array()
 # Initialise our states and variables, and compute our computed constants, and output the initial value/guess of our
 # states and variables.
 
-model.initialise_variables(states, variables)
+model.initialise_variables(states, rates, variables)
 model.compute_computed_constants(variables)
 model.compute_rates(voi, states, rates, variables)
 model.compute_variables(voi, states, rates, variables)
