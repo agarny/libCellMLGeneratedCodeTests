@@ -3,41 +3,71 @@ import importlib.util
 import math
 
 
-def variable_type(type):
-    if type == model.VariableType.CONSTANT:
-        return "constant"
-    elif type == model.VariableType.COMPUTED_CONSTANT:
-        return "computed constant"
-    else:
-        return "algebraic"
-
-
 def print_information(model):
     print("---------------------------------------[Information][BEGIN]")
     print(f"- Generator version: {model.__version__}")
     print(f"- libCellML version: {model.LIBCELLML_VERSION}")
     print("---------------------------------------")
-    print(f"- Number of variables: {model.VARIABLE_COUNT}")
-    print("- Variables:")
+    print(f"- Number of constants: {model.CONSTANT_COUNT}")
+    print("- Constants:")
 
-    for i in range(0, model.VARIABLE_COUNT):
+    for i in range(0, model.CONSTANT_COUNT):
         print(
-            f"   - {model.VARIABLE_INFO[i]['name']} [{model.VARIABLE_INFO[i]['units']}]:"
+            f"   - {model.CONSTANT_INFO[i]['component']}.{model.CONSTANT_INFO[i]['name']} [{model.CONSTANT_INFO[i]['units']}]"
         )
-        print(f"      - Type: {variable_type(model.VARIABLE_INFO[i]['type'])}")
-        print(f"      - Component: {model.VARIABLE_INFO[i]['component']}")
+
+    print("---------------------------------------")
+    print(f"- Number of computed constants: {model.COMPUTED_CONSTANT_COUNT}")
+    print("- Computed constants:")
+
+    for i in range(0, model.COMPUTED_CONSTANT_COUNT):
+        print(
+            f"   - {model.COMPUTED_CONSTANT_INFO[i]['component']}.{model.COMPUTED_CONSTANT_INFO[i]['name']} [{model.COMPUTED_CONSTANT_INFO[i]['units']}]"
+        )
+
+    print("---------------------------------------")
+    print(f"- Number of algebraic variables: {model.ALGEBRAIC_COUNT}")
+    print("- Algebraic variables:")
+
+    for i in range(0, model.ALGEBRAIC_COUNT):
+        print(
+            f"   - {model.ALGEBRAIC_INFO[i]['component']}.{model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}]"
+        )
 
     print("---------------------------------------[Information][END]")
 
 
-def print_values(title, variables, expected_values):
-    w = 0
-
-    for i in range(0, model.VARIABLE_COUNT):
-        cw = common.iwidth(variables[i])
+def determine_w(w, values, count):
+    for i in range(0, count):
+        cw = common.iwidth(values[i])
 
         if cw > w:
             w = cw
+
+    return w
+
+
+def print_array(values, count, info, expected_values, w, ew):
+    for i in range(0, count):
+        print(f"- {info[i]['name']}: {int(w + math.isnan(values[i]) * 4 - common.iwidth(values[i])) * ' '}{values[i] :.3f} [{info[i]['units']}]", end='')
+
+        try:
+            expected_value = expected_values[info[i]['name']]
+
+            if common.area_nearly_equal(values[i], expected_value):
+                print(" |  OK")
+            else:
+                print(f" | NOK | {int(ew - common.iwidth(expected_value)) * ' '}{expected_value :.3f}")
+        except:
+            pass
+
+
+def print_values(title, constants, computed_constants, algebraic, expected_values):
+    w = 0
+
+    w = determine_w(w, constants, model.CONSTANT_COUNT)
+    w = determine_w(w, computed_constants, model.COMPUTED_CONSTANT_COUNT)
+    w = determine_w(w, algebraic, model.ALGEBRAIC_COUNT)
 
     ew = 0
     ev = list(expected_values.values())
@@ -51,18 +81,9 @@ def print_values(title, variables, expected_values):
     print("")
     print(f"---------------------------------------[{title}][BEGIN]")
 
-    for i in range(0, model.VARIABLE_COUNT):
-        print(f"- {model.VARIABLE_INFO[i]['name']}: {int(w + math.isnan(variables[i]) * 4 - common.iwidth(variables[i])) * ' '}{variables[i] :.3f} [{model.VARIABLE_INFO[i]['units']}]", end='');
-
-        try:
-            expected_value = expected_values[model.VARIABLE_INFO[i]['name']];
-
-            if common.area_nearly_equal(variables[i], expected_value):
-                print(" |  OK")
-            else:
-                print(f" | NOK | {int(ew - common.iwidth(expected_value)) * ' '}{expected_value :.3f}")
-        except:
-            pass
+    print_array(constants, model.CONSTANT_COUNT, model.CONSTANT_INFO, expected_values, w, ew)
+    print_array(computed_constants, model.COMPUTED_CONSTANT_COUNT, model.COMPUTED_CONSTANT_INFO, expected_values, w, ew)
+    print_array(algebraic, model.ALGEBRAIC_COUNT, model.ALGEBRAIC_INFO, expected_values, w, ew)
 
     print(f"---------------------------------------[{title}][END]")
 
@@ -77,21 +98,23 @@ spec.loader.exec_module(model)
 
 print_information(model)
 
-# Create our array of variables.
+# Create our various arrays.
 
-variables = model.create_variables_array()
+constants = model.create_constants_array()
+computed_constants = model.create_computed_constants_array()
+algebraic = model.create_algebraic_array()
 
-# Initialise our variables, compute our computed constants, and output the initial value/guess of our variables.
+# Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
-model.initialise_variables(variables)
-model.compute_computed_constants(variables)
+model.initialise_variables(constants, computed_constants, algebraic)
+model.compute_computed_constants(constants, computed_constants)
 
-print_values("Initial variable values/guesses", variables, @INITIAL_VARIABLE_VALUES_GUESSES@)
+print_values("Initial variable values/guesses", constants, computed_constants, algebraic, @INITIAL_VARIABLE_VALUES_GUESSES@)
 
 # Compute our variables.
 
-model.compute_variables(variables)
+model.compute_variables(constants, computed_constants, algebraic)
 
-# Output the final value of our variables.
+# Output the final value of our constants, computed constants, and algebraic variables.
 
-print_values("Final variable values", variables, @FINAL_VARIABLE_VALUES@)
+print_values("Final variable values", constants, computed_constants, algebraic, @FINAL_VARIABLE_VALUES@)

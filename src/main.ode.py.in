@@ -21,28 +21,42 @@ def print_information(model):
     print(f"- libCellML version: {model.LIBCELLML_VERSION}")
     print("---------------------------------------")
     print("- Variable of integration:")
-    print(f"   - {model.VOI_INFO['name']} [{model.VOI_INFO['units']}]:")
-    print(f"      - Type: {variable_type(model.VOI_INFO['type'])}")
-    print(f"      - Component: {model.VOI_INFO['component']}")
+    print(f"   - {model.VOI_INFO['component']}.{model.VOI_INFO['name']} [{model.VOI_INFO['units']}]")
     print("---------------------------------------")
     print(f"- Number of states: {model.STATE_COUNT}")
     print("- States:")
 
     for i in range(0, model.STATE_COUNT):
-        print(f"   - {model.STATE_INFO[i]['name']} [{model.STATE_INFO[i]['units']}]:")
-        print(f"      - Type: {variable_type(model.STATE_INFO[i]['type'])}")
-        print(f"      - Component: {model.STATE_INFO[i]['component']}")
+        print(
+            f"   - {model.STATE_INFO[i]['component']}.{model.STATE_INFO[i]['name']} [{model.STATE_INFO[i]['units']}]"
+        )
 
     print("---------------------------------------")
-    print(f"- Number of variables: {model.VARIABLE_COUNT}")
-    print("- Variables:")
+    print(f"- Number of constants: {model.CONSTANT_COUNT}")
+    print("- Constants:")
 
-    for i in range(0, model.VARIABLE_COUNT):
+    for i in range(0, model.CONSTANT_COUNT):
         print(
-            f"   - {model.VARIABLE_INFO[i]['name']} [{model.VARIABLE_INFO[i]['units']}]:"
+            f"   - {model.CONSTANT_INFO[i]['component']}.{model.CONSTANT_INFO[i]['name']} [{model.CONSTANT_INFO[i]['units']}]"
         )
-        print(f"      - Type: {variable_type(model.VARIABLE_INFO[i]['type'])}")
-        print(f"      - Component: {model.VARIABLE_INFO[i]['component']}")
+
+    print("---------------------------------------")
+    print(f"- Number of computed constants: {model.COMPUTED_CONSTANT_COUNT}")
+    print("- Computed constants:")
+
+    for i in range(0, model.COMPUTED_CONSTANT_COUNT):
+        print(
+            f"   - {model.COMPUTED_CONSTANT_INFO[i]['component']}.{model.COMPUTED_CONSTANT_INFO[i]['name']} [{model.COMPUTED_CONSTANT_INFO[i]['units']}]"
+        )
+
+    print("---------------------------------------")
+    print(f"- Number of algebraic variables: {model.ALGEBRAIC_COUNT}")
+    print("- Algebraic variables:")
+
+    for i in range(0, model.ALGEBRAIC_COUNT):
+        print(
+            f"   - {model.ALGEBRAIC_INFO[i]['component']}.{model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}]"
+        )
 
     print("---------------------------------------[Information][END]")
 
@@ -53,20 +67,32 @@ def print_headers():
     for i in range(0, model.STATE_COUNT):
         print(f",{model.STATE_INFO[i]['name']}", end="")
 
-    for i in range(0, model.VARIABLE_COUNT):
-        print(f",{model.VARIABLE_INFO[i]['name']}", end="")
+    for i in range(0, model.CONSTANT_COUNT):
+        print(f",{model.CONSTANT_INFO[i]['name']}", end="")
+
+    for i in range(0, model.COMPUTED_CONSTANT_COUNT):
+        print(f",{model.COMPUTED_CONSTANT_INFO[i]['name']}", end="")
+
+    for i in range(0, model.ALGEBRAIC_COUNT):
+        print(f",{model.ALGEBRAIC_INFO[i]['name']}", end="")
 
     print("")
 
 
-def print_values(voi, states, variables):
+def print_values(voi, states, constants, computed_constants, algebraic):
     print(voi, end="")
 
     for i in range(0, model.STATE_COUNT):
         print(f",{states[i]}", end="")
 
-    for i in range(0, model.VARIABLE_COUNT):
-        print(f",{variables[i]}", end="")
+    for i in range(0, model.CONSTANT_COUNT):
+        print(f",{constants[i]}", end="")
+
+    for i in range(0, model.COMPUTED_CONSTANT_COUNT):
+        print(f",{computed_constants[i]}", end="")
+
+    for i in range(0, model.ALGEBRAIC_COUNT):
+        print(f",{algebraic[i]}", end="")
 
     print("")
 
@@ -89,15 +115,16 @@ print_information(model)
 voi = 0.0
 states = model.create_states_array()
 rates = model.create_states_array()
-variables = model.create_variables_array()
+constants = model.create_constants_array()
+computed_constants = model.create_computed_constants_array()
+algebraic = model.create_algebraic_array()
 
-# Initialise our states and variables, and compute our computed constants, and output the initial value/guess of our
-# states and variables.
+# Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
-model.initialise_variables(states, rates, variables)
-model.compute_computed_constants(variables)
-model.compute_rates(voi, states, rates, variables)
-model.compute_variables(voi, states, rates, variables)
+model.initialise_variables(states, rates, constants, computed_constants, algebraic)
+model.compute_computed_constants(constants, computed_constants)
+model.compute_rates(voi, states, rates, constants, computed_constants, algebraic)
+model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
 print("")
 print("---------------------------------------[Values][BEGIN]")
@@ -105,7 +132,7 @@ print("---------------------------------------[Values][BEGIN]")
 print_headers()
 
 if not @SKIP_FIRST_OUTPUT_POINT@:
-    print_values(voi, states, variables)
+    print_values(voi, states, constants, computed_constants, algebraic)
 
 # Run our model.
 
@@ -128,26 +155,24 @@ if not @USE_OUTPUT_POINTS@:
 voi = 0.0
 
 for output_point in output_points:
-    def func(t, y, rates, variables):
-        model.compute_rates(t, y, rates, variables, )
+    def func(t, y, rates, constants, computed_constants, algebraic):
+        model.compute_rates(t, y, rates, constants, computed_constants, algebraic)
 
         return rates
 
     # Integrate our model.
 
-    res = solve_ivp(func, (voi, output_point), states, args=(rates, variables), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
+    res = solve_ivp(func, (voi, output_point), states, args=(rates, constants, computed_constants, algebraic), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
     states = res.y[:, -1]
-
-    # break
 
     voi = output_point
 
     # Compute our variables.
 
-    model.compute_variables(voi, states, rates, variables)
+    model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
-    # Output the value of our states and variables.
+    # Output the value of our states, constants, computed constants, and algebraic variables.
 
-    print_values(voi, states, variables)
+    print_values(voi, states, constants, computed_constants, algebraic)
 
 print("---------------------------------------[Values][END]")
