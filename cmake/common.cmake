@@ -6,9 +6,11 @@ function(build_executable EXECUTABLE TYPE)
 
     if("${TYPE}" STREQUAL "ODE")
         set(OPTIONS
+            EXTERNALS
             SKIP_FIRST_OUTPUT_POINT
         )
         set(ONE_VALUE_KEYWORDS
+            EXTERNAL_VALUES
             ENDING_POINT
             POINT_INTERVAL
             OUTPUT_POINTS
@@ -17,6 +19,14 @@ function(build_executable EXECUTABLE TYPE)
         )
 
         cmake_parse_arguments(ARG "${OPTIONS}" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
+
+        if(ARG_EXTERNALS)
+            set(EXTERNALS 1)
+        else()
+            set(EXTERNALS 0)
+        endif()
+
+        set(EXTERNAL_VALUES "{${ARG_EXTERNAL_VALUES}}")
 
         if("${ARG_ENDING_POINT}" STREQUAL "")
             set(ENDING_POINT 1000.0)
@@ -74,12 +84,21 @@ function(build_executable EXECUTABLE TYPE)
 
         configure_file(../main.ode.py.in ${MAIN_PY})
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")
+        set(OPTIONS
+            EXTERNALS
+        )
         set(ONE_VALUE_KEYWORDS
             INITIAL_VARIABLE_VALUES_GUESSES
             FINAL_VARIABLE_VALUES
         )
 
-        cmake_parse_arguments(ARG "" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
+        cmake_parse_arguments(ARG "${OPTIONS}" "${ONE_VALUE_KEYWORDS}" "" ${ARGN})
+
+        if(ARG_EXTERNALS)
+            set(EXTERNALS 1)
+        else()
+            set(EXTERNALS 0)
+        endif()
 
         set(INITIAL_VARIABLE_VALUES_GUESSES "{${ARG_INITIAL_VARIABLE_VALUES_GUESSES}}")
         set(FINAL_VARIABLE_VALUES "{${ARG_FINAL_VARIABLE_VALUES}}")

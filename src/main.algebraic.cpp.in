@@ -6,6 +6,15 @@ extern "C" {
 
 #include <iostream>
 
+#define EXTERNALS @EXTERNALS@
+
+#if(EXTERNALS == 1)
+double externalVariable(double *constants, double *computedConstants, double *algebraic, double *externals, size_t index)
+{
+    return 5.0;
+}
+#endif
+
 void printInformation()
 {
     std::cout << "---------------------------------------[Information][BEGIN]" << std::endl;
@@ -34,6 +43,16 @@ void printInformation()
     for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
         std::cout << "   - " << ALGEBRAIC_INFO[i].component << "." << ALGEBRAIC_INFO[i].name << " [" << ALGEBRAIC_INFO[i].units << "]" << std::endl;
     }
+
+#if(EXTERNALS == 1)
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of external variables: " << EXTERNAL_COUNT << std::endl;
+    std::cout << "- External variables:" << std::endl;
+
+    for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
+        std::cout << "   - " << EXTERNAL_INFO[i].component << "." << EXTERNAL_INFO[i].name << " [" << EXTERNAL_INFO[i].units << "]" << std::endl;
+    }
+#endif
 
     std::cout << "---------------------------------------[Information][END]" << std::endl;
 }
@@ -68,13 +87,20 @@ void printArray(const double *values, size_t count, const VariableInfo *info, co
     }
 }
 
+#if(EXTERNALS == 1)
+void printValues(const std::string &title, const double *constants, const double *computedConstants, const double *algebraic, const double *externals, const std::map<std::string, double> &expectedValues)
+#else
 void printValues(const std::string &title, const double *constants, const double *computedConstants, const double *algebraic, const std::map<std::string, double> &expectedValues)
+#endif
 {
     int w = 0;
 
     determineW(w, constants, CONSTANT_COUNT);
     determineW(w, computedConstants, COMPUTED_CONSTANT_COUNT);
     determineW(w, algebraic, ALGEBRAIC_COUNT);
+#if(EXTERNALS == 1)
+    determineW(w, externals, EXTERNAL_COUNT);
+#endif
 
     int ew = 0;
     auto ev = expectedValues.begin();
@@ -94,6 +120,9 @@ void printValues(const std::string &title, const double *constants, const double
     printArray(constants, CONSTANT_COUNT, CONSTANT_INFO, expectedValues, w, ew);
     printArray(computedConstants, COMPUTED_CONSTANT_COUNT, COMPUTED_CONSTANT_INFO, expectedValues, w, ew);
     printArray(algebraic, ALGEBRAIC_COUNT, ALGEBRAIC_INFO, expectedValues, w, ew);
+#if(EXTERNALS == 1)
+    printArray(externals, EXTERNAL_COUNT, EXTERNAL_INFO, expectedValues, w, ew);
+#endif
 
     std::cout << "---------------------------------------[" << title << "][END]" << std::endl;
 }
@@ -109,21 +138,36 @@ int main()
     double *constants = createConstantsArray();
     double *computedConstants = createComputedConstantsArray();
     double *algebraic = createAlgebraicArray();
+#if(EXTERNALS == 1)
+    double *externals = createExternalsArray();
+#endif
 
     // Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
     initialiseVariables(constants, computedConstants, algebraic);
     computeComputedConstants(constants, computedConstants);
 
+#if(EXTERNALS == 1)
+    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, externals, @INITIAL_VARIABLE_VALUES_GUESSES@);
+#else
     printValues("Initial variable values/guesses", constants, computedConstants, algebraic, @INITIAL_VARIABLE_VALUES_GUESSES@);
+#endif
 
     // Compute our variables.
 
+#if(EXTERNALS == 1)
+    computeVariables(constants, computedConstants, algebraic, externals, externalVariable);
+#else
     computeVariables(constants, computedConstants, algebraic);
+#endif
 
     // Output the final value of our constants, computed constants, and algebraic variables.
 
+#if(EXTERNALS == 1)
+    printValues("Final variable values", constants, computedConstants, algebraic, externals, @FINAL_VARIABLE_VALUES@);
+#else
     printValues("Final variable values", constants, computedConstants, algebraic, @FINAL_VARIABLE_VALUES@);
+#endif
 
     // Clean up after ourselves.
 

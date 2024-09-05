@@ -3,6 +3,9 @@ import importlib.util
 import math
 
 
+externals = @EXTERNALS@
+
+
 def print_information(model):
     print("---------------------------------------[Information][BEGIN]")
     print(f"- Generator version: {model.__version__}")
@@ -33,6 +36,16 @@ def print_information(model):
         print(
             f"   - {model.ALGEBRAIC_INFO[i]['component']}.{model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}]"
         )
+
+    if externals:
+        print("---------------------------------------")
+        print(f"- Number of external variables: {model.EXTERNAL_COUNT}")
+        print("- External variables:")
+
+        for i in range(0, model.EXTERNAL_COUNT):
+            print(
+                f"   - {model.EXTERNAL_INFO[i]['component']}.{model.EXTERNAL_INFO[i]['name']} [{model.EXTERNAL_INFO[i]['units']}]"
+            )
 
     print("---------------------------------------[Information][END]")
 
@@ -69,6 +82,9 @@ def print_values(title, constants, computed_constants, algebraic, expected_value
     w = determine_w(w, computed_constants, model.COMPUTED_CONSTANT_COUNT)
     w = determine_w(w, algebraic, model.ALGEBRAIC_COUNT)
 
+    if externals:
+        w = determine_w(w, externals, model.EXTERNAL_COUNT)
+
     ew = 0
     ev = list(expected_values.values())
 
@@ -84,6 +100,9 @@ def print_values(title, constants, computed_constants, algebraic, expected_value
     print_array(constants, model.CONSTANT_COUNT, model.CONSTANT_INFO, expected_values, w, ew)
     print_array(computed_constants, model.COMPUTED_CONSTANT_COUNT, model.COMPUTED_CONSTANT_INFO, expected_values, w, ew)
     print_array(algebraic, model.ALGEBRAIC_COUNT, model.ALGEBRAIC_INFO, expected_values, w, ew)
+
+    if externals:
+        print_array(externals, model.EXTERNAL_COUNT, model.EXTERNAL_INFO, expected_values, w, ew)
 
     print(f"---------------------------------------[{title}][END]")
 

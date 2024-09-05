@@ -10,6 +10,28 @@ extern "C" {
 
 #include <iostream>
 
+#define EXTERNALS @EXTERNALS@
+
+#if(EXTERNALS == 1)
+double externalVariable(double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic, double *externals, size_t index)
+{
+    static const std::vector<std::vector<double>> externalValues = @EXTERNAL_VALUES@;
+
+    for (size_t i = 0; i < externalValues.size()-1; ++i) {
+        double voi0 = externalValues[i][0];
+        double voi1 = externalValues[i+1][0];
+
+        if ((voi >= voi0) && (voi < voi1)) {
+            double value0 = externalValues[i][index+1];
+
+            return value0+(voi-voi0)/(voi1-voi0)*(externalValues[i+1][index+1]-value0);
+        }
+    }
+
+    return externalValues[externalValues.size()-1][index+1];
+}
+#endif
+
 void printInformation()
 {
     std::cout << "---------------------------------------[Information][BEGIN]" << std::endl;
@@ -50,6 +72,16 @@ void printInformation()
         std::cout << "   - " << ALGEBRAIC_INFO[i].component << "." << ALGEBRAIC_INFO[i].name << " [" << ALGEBRAIC_INFO[i].units << "]" << std::endl;
     }
 
+#if(EXTERNALS == 1)
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of external variables: " << EXTERNAL_COUNT << std::endl;
+    std::cout << "- External variables:" << std::endl;
+
+    for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
+        std::cout << "   - " << EXTERNAL_INFO[i].component << "." << EXTERNAL_INFO[i].name << " [" << EXTERNAL_INFO[i].units << "]" << std::endl;
+    }
+#endif
+
     std::cout << "---------------------------------------[Information][END]" << std::endl;
 }
 
@@ -73,10 +105,20 @@ void printHeaders()
         std::cout << "," << ALGEBRAIC_INFO[i].name;
     }
 
+#if(EXTERNALS == 1)
+    for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
+        std::cout << "," << EXTERNAL_INFO[i].name;
+    }
+#endif
+
     std::cout << std::endl;
 }
 
+#if(EXTERNALS == 1)
+void printValues(double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic, const double *externals)
+#else
 void printValues(double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic)
+#endif
 {
     std::cout << voi;
 
@@ -96,22 +138,41 @@ void printValues(double voi, const double *states, const double *constants, cons
         std::cout << "," << algebraic[i];
     }
 
+#if(EXTERNALS == 1)
+    for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
+        std::cout << "," << externals[i];
+    }
+#endif
+
     std::cout << std::endl;
 }
 
 typedef struct {
+#if(EXTERNALS == 1)
+    void (*computeRates)(double, double *, double *, double *, double *, double *, double *, ExternalVariable);
+#else
     void (*computeRates)(double, double *, double *, double *, double *, double *);
+#endif
 
     double *constants;
     double *computedConstants;
     double *algebraic;
+#if(EXTERNALS == 1)
+    double *externals;
+
+    ExternalVariable externalVariable;
+#endif
 } UserOdeData;
 
 int func(double voi, N_Vector y, N_Vector yDot, void *userData)
 {
     UserOdeData *realUserData = (UserOdeData *) userData;
 
+#if(EXTERNALS == 1)
+    realUserData->computeRates(voi, N_VGetArrayPointer_Serial(y), N_VGetArrayPointer_Serial(yDot), realUserData->constants, realUserData->computedConstants, realUserData->algebraic, realUserData->externals, realUserData->externalVariable);
+#else
     realUserData->computeRates(voi, N_VGetArrayPointer_Serial(y), N_VGetArrayPointer_Serial(yDot), realUserData->constants, realUserData->computedConstants, realUserData->algebraic);
+#endif
 
     return 0;
 }
@@ -130,14 +191,23 @@ int main()
     double *constants = createConstantsArray();
     double *computedConstants = createComputedConstantsArray();
     double *algebraic = createAlgebraicArray();
+#if(EXTERNALS == 1)
+    double *externals = createExternalsArray();
+#endif
 
     // Initialise our states, rates, constants, computed constants, and algebraic variables and output their initial
     // value/guess.
 
     initialiseVariables(states, rates, constants, computedConstants, algebraic);
     computeComputedConstants(constants, computedConstants);
+
+#if(EXTERNALS == 1)
+    computeRates(voi, states, rates, constants, computedConstants, algebraic, externals, externalVariable);
+    computeVariables(voi, states, rates, constants, computedConstants, algebraic, externals, externalVariable);
+#else
     computeRates(voi, states, rates, constants, computedConstants, algebraic);
     computeVariables(voi, states, rates, constants, computedConstants, algebraic);
+#endif
 
     std::cout << std::endl;
     std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;
@@ -145,7 +215,11 @@ int main()
     printHeaders();
 
     if (!@SKIP_FIRST_OUTPUT_POINT@) {
+#if(EXTERNALS == 1)
+        printValues(voi, states, constants, computedConstants, algebraic, externals);
+#else
         printValues(voi, states, constants, computedConstants, algebraic);
+#endif
     }
 
     // Create our SUNDIALS context.
@@ -166,7 +240,11 @@ int main()
 
     // Set our user data.
 
+#if(EXTERNALS == 1)
+    UserOdeData userData = { computeRates, constants, computedConstants, algebraic, externals, externalVariable };
+#else
     UserOdeData userData = { computeRates, constants, computedConstants, algebraic };
+#endif
 
     CVodeSetUserData(solver, &userData);
 
@@ -208,11 +286,19 @@ int main()
 
         // Compute our variables.
 
+#if(EXTERNALS == 1)
+        computeVariables(voi, states, rates, constants, computedConstants, algebraic, externals, externalVariable);
+#else
         computeVariables(voi, states, rates, constants, computedConstants, algebraic);
+#endif
 
         // Output the value of our states, constants, computed constants, and algebraic variables.
 
+#if(EXTERNALS == 1)
+        printValues(voi, states, constants, computedConstants, algebraic, externals);
+#else
         printValues(voi, states, constants, computedConstants, algebraic);
+#endif
     }
 
     std::cout << "---------------------------------------[Values][END]" << std::endl;

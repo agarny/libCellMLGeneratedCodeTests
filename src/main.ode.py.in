@@ -2,6 +2,9 @@ import importlib.util
 from scipy.integrate import solve_ivp
 
 
+externals = @EXTERNALS@
+
+
 def variable_type(type):
     if type == model.VariableType.VARIABLE_OF_INTEGRATION:
         return "variable of integration"
@@ -58,6 +61,16 @@ def print_information(model):
             f"   - {model.ALGEBRAIC_INFO[i]['component']}.{model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}]"
         )
 
+    if externals:
+        print("---------------------------------------")
+        print(f"- Number of external variables: {model.EXTERNAL_COUNT}")
+        print("- External variables:")
+
+        for i in range(0, model.EXTERNAL_COUNT):
+            print(
+                f"   - {model.EXTERNAL_INFO[i]['component']}.{model.EXTERNAL_INFO[i]['name']} [{model.EXTERNAL_INFO[i]['units']}]"
+            )
+
     print("---------------------------------------[Information][END]")
 
 
@@ -76,6 +89,10 @@ def print_headers():
     for i in range(0, model.ALGEBRAIC_COUNT):
         print(f",{model.ALGEBRAIC_INFO[i]['name']}", end="")
 
+    if externals:
+        for i in range(0, model.EXTERNAL_COUNT):
+            print(f",{model.EXTERNAL_INFO[i]['name']}", end="")
+
     print("")
 
 
@@ -93,6 +110,10 @@ def print_values(voi, states, constants, computed_constants, algebraic):
 
     for i in range(0, model.ALGEBRAIC_COUNT):
         print(f",{algebraic[i]}", end="")
+
+    if externals:
+        for i in range(0, model.EXTERNAL_COUNT):
+            print(f",{externals[i]}", end="")
 
     print("")
 
