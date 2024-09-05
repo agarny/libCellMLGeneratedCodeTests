@@ -33,7 +33,7 @@ void nlaSolve(void (*objectiveFunction)(double *, double *, void *), double *u, 
 
     SUNContext context;
 
-    SUNContext_Create(NULL, &context);
+    SUNContext_Create(0, &context);
 
     // Create our KINSOL solver.
 

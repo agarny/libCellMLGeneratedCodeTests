@@ -10,36 +10,6 @@ extern "C" {
 
 #include <iostream>
 
-std::string variableType(VariableType variableType)
-{
-    std::string res;
-
-    switch (variableType) {
-    case VARIABLE_OF_INTEGRATION:
-        res = "variable of integration";
-
-        break;
-    case STATE:
-        res = "state";
-
-        break;
-    case CONSTANT:
-        res = "constant";
-
-        break;
-    case COMPUTED_CONSTANT:
-        res = "computed constant";
-
-        break;
-    default: // ALGEBRAIC.
-        res = "algebraic";
-
-        break;
-    }
-
-    return res;
-}
-
 void printInformation()
 {
     std::cout << "---------------------------------------[Information][BEGIN]" << std::endl;
@@ -47,27 +17,37 @@ void printInformation()
     std::cout << "- libCellML version: " << LIBCELLML_VERSION << std::endl;
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Variable of integration:" << std::endl;
-    std::cout << "   - " << VOI_INFO.name << " [" << VOI_INFO.units << "]:" << std::endl;
-    std::cout << "      - Type: " << variableType(VOI_INFO.type) << std::endl;
-    std::cout << "      - Component: " << VOI_INFO.component << std::endl;
+    std::cout << "   - " << VOI_INFO.component << "." << VOI_INFO.name << " [" << VOI_INFO.units << "]" << std::endl;
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Number of states: " << STATE_COUNT << std::endl;
     std::cout << "- States:" << std::endl;
 
     for (size_t i = 0; i < STATE_COUNT; ++i) {
-        std::cout << "   - " << STATE_INFO[i].name << " [" << STATE_INFO[i].units << "]:" << std::endl;
-        std::cout << "      - Type: " << variableType(STATE_INFO[i].type) << std::endl;
-        std::cout << "      - Component: " << STATE_INFO[i].component << std::endl;
+        std::cout << "   - " << STATE_INFO[i].component << "." << STATE_INFO[i].name << " [" << STATE_INFO[i].units << "]" << std::endl;
     }
 
     std::cout << "---------------------------------------" << std::endl;
-    std::cout << "- Number of variables: " << VARIABLE_COUNT << std::endl;
-    std::cout << "- Variables:" << std::endl;
+    std::cout << "- Number of constants: " << CONSTANT_COUNT << std::endl;
+    std::cout << "- Constants:" << std::endl;
 
-    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        std::cout << "   - " << VARIABLE_INFO[i].name << " [" << VARIABLE_INFO[i].units << "]:" << std::endl;
-        std::cout << "      - Type: " << variableType(VARIABLE_INFO[i].type) << std::endl;
-        std::cout << "      - Component: " << VARIABLE_INFO[i].component << std::endl;
+    for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
+        std::cout << "   - " << CONSTANT_INFO[i].component << "." << CONSTANT_INFO[i].name << " [" << CONSTANT_INFO[i].units << "]" << std::endl;
+    }
+
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of computed constants: " << COMPUTED_CONSTANT_COUNT << std::endl;
+    std::cout << "- Computed constants:" << std::endl;
+
+    for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
+        std::cout << "   - " << COMPUTED_CONSTANT_INFO[i].component << "." << COMPUTED_CONSTANT_INFO[i].name << " [" << COMPUTED_CONSTANT_INFO[i].units << "]" << std::endl;
+    }
+
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "- Number of algebraic variables: " << ALGEBRAIC_COUNT << std::endl;
+    std::cout << "- Algebraic variables:" << std::endl;
+
+    for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
+        std::cout << "   - " << ALGEBRAIC_INFO[i].component << "." << ALGEBRAIC_INFO[i].name << " [" << ALGEBRAIC_INFO[i].units << "]" << std::endl;
     }
 
     std::cout << "---------------------------------------[Information][END]" << std::endl;
@@ -81,14 +61,22 @@ void printHeaders()
         std::cout << "," << STATE_INFO[i].name;
     }
 
-    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        std::cout << "," << VARIABLE_INFO[i].name;
+    for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
+        std::cout << "," << CONSTANT_INFO[i].name;
+    }
+
+    for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
+        std::cout << "," << COMPUTED_CONSTANT_INFO[i].name;
+    }
+
+    for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
+        std::cout << "," << ALGEBRAIC_INFO[i].name;
     }
 
     std::cout << std::endl;
 }
 
-void printValues(double voi, const double *states, const double *variables)
+void printValues(double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic)
 {
     std::cout << voi;
 
@@ -96,24 +84,34 @@ void printValues(double voi, const double *states, const double *variables)
         std::cout << "," << states[i];
     }
 
-    for (size_t i = 0; i < VARIABLE_COUNT; ++i) {
-        std::cout << "," << variables[i];
+    for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
+        std::cout << "," << constants[i];
+    }
+
+    for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
+        std::cout << "," << computedConstants[i];
+    }
+
+    for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
+        std::cout << "," << algebraic[i];
     }
 
     std::cout << std::endl;
 }
 
 typedef struct {
-    void (*computeRates)(double, double *, double *, double *);
+    void (*computeRates)(double, double *, double *, double *, double *, double *);
 
-    double *variables;
+    double *constants;
+    double *computedConstants;
+    double *algebraic;
 } UserOdeData;
 
 int func(double voi, N_Vector y, N_Vector yDot, void *userData)
 {
     UserOdeData *realUserData = (UserOdeData *) userData;
 
-    realUserData->computeRates(voi, N_VGetArrayPointer_Serial(y), N_VGetArrayPointer_Serial(yDot), realUserData->variables);
+    realUserData->computeRates(voi, N_VGetArrayPointer_Serial(y), N_VGetArrayPointer_Serial(yDot), realUserData->constants, realUserData->computedConstants, realUserData->algebraic);
 
     return 0;
 }
@@ -129,15 +127,17 @@ int main()
     double voi = 0.0;
     double *states = createStatesArray();
     double *rates = createStatesArray();
-    double *variables = createVariablesArray();
+    double *constants = createConstantsArray();
+    double *computedConstants = createComputedConstantsArray();
+    double *algebraic = createAlgebraicArray();
 
-    // Initialise our states and variables, and compute our computed constants, and output the initial value/guess of
-    // our states and variables.
+    // Initialise our states, rates, constants, computed constants, and algebraic variables and output their initial
+    // value/guess.
 
-    initialiseVariables(states, rates, variables);
-    computeComputedConstants(variables);
-    computeRates(voi, states, rates, variables);
-    computeVariables(voi, states, rates, variables);
+    initialiseVariables(states, rates, constants, computedConstants, algebraic);
+    computeComputedConstants(constants, computedConstants);
+    computeRates(voi, states, rates, constants, computedConstants, algebraic);
+    computeVariables(voi, states, rates, constants, computedConstants, algebraic);
 
     std::cout << std::endl;
     std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;
@@ -145,14 +145,14 @@ int main()
     printHeaders();
 
     if (!@SKIP_FIRST_OUTPUT_POINT@) {
-        printValues(voi, states, variables);
+        printValues(voi, states, constants, computedConstants, algebraic);
     }
 
     // Create our SUNDIALS context.
 
     SUNContext context;
 
-    SUNContext_Create(NULL, &context);
+    SUNContext_Create(0, &context);
 
     // Create our CVODE solver.
 
@@ -166,7 +166,7 @@ int main()
 
     // Set our user data.
 
-    UserOdeData userData = { computeRates, variables };
+    UserOdeData userData = { computeRates, constants, computedConstants, algebraic };
 
     CVodeSetUserData(solver, &userData);
 
@@ -208,11 +208,11 @@ int main()
 
         // Compute our variables.
 
-        computeVariables(voi, states, rates, variables);
+        computeVariables(voi, states, rates, constants, computedConstants, algebraic);
 
-        // Output the value of our states and variables.
+        // Output the value of our states, constants, computed constants, and algebraic variables.
 
-        printValues(voi, states, variables);
+        printValues(voi, states, constants, computedConstants, algebraic);
     }
 
     std::cout << "---------------------------------------[Values][END]" << std::endl;
@@ -227,7 +227,9 @@ int main()
 
     deleteArray(states);
     deleteArray(rates);
-    deleteArray(variables);
+    deleteArray(constants);
+    deleteArray(computedConstants);
+    deleteArray(algebraic);
 
     return 0;
 }
