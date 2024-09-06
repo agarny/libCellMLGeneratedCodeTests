@@ -128,7 +128,7 @@ algebraic = model.create_algebraic_array()
 model.initialise_variables(constants, computed_constants, algebraic)
 model.compute_computed_constants(constants, computed_constants)
 
-print_values("Initial variable values/guesses", constants, computed_constants, algebraic, @INITIAL_VARIABLE_VALUES_GUESSES@)
+print_values("Initial variable values/guesses", constants, computed_constants, algebraic, @INITIAL_VALUES_GUESSES@)
 
 # Compute our variables.
 
@@ -136,4 +136,4 @@ model.compute_variables(constants, computed_constants, algebraic)
 
 # Output the final value of our constants, computed constants, and algebraic variables.
 
-print_values("Final variable values", constants, computed_constants, algebraic, @FINAL_VARIABLE_VALUES@)
+print_values("Final variable values", constants, computed_constants, algebraic, @FINAL_VALUES@)

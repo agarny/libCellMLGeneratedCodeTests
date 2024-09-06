@@ -148,9 +148,9 @@ int main()
     computeComputedConstants(constants, computedConstants);
 
 #if(EXTERNALS == 1)
-    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, externals, @INITIAL_VARIABLE_VALUES_GUESSES@);
+    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, externals, @INITIAL_VALUES_GUESSES@);
 #else
-    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, @INITIAL_VARIABLE_VALUES_GUESSES@);
+    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, @INITIAL_VALUES_GUESSES@);
 #endif
 
     // Compute our variables.
@@ -164,9 +164,9 @@ int main()
     // Output the final value of our constants, computed constants, and algebraic variables.
 
 #if(EXTERNALS == 1)
-    printValues("Final variable values", constants, computedConstants, algebraic, externals, @FINAL_VARIABLE_VALUES@);
+    printValues("Final variable values", constants, computedConstants, algebraic, externals, @FINAL_VALUES@);
 #else
-    printValues("Final variable values", constants, computedConstants, algebraic, @FINAL_VARIABLE_VALUES@);
+    printValues("Final variable values", constants, computedConstants, algebraic, @FINAL_VALUES@);
 #endif
 
     // Clean up after ourselves.
