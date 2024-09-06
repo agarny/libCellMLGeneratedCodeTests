@@ -22,35 +22,39 @@ void printInformation()
     std::cout << "- libCellML version: " << LIBCELLML_VERSION << std::endl;
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Number of constants: " << CONSTANT_COUNT << std::endl;
-    std::cout << "- Constants:" << std::endl;
 
-    for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
-        std::cout << "   - " << CONSTANT_INFO[i].component << "." << CONSTANT_INFO[i].name << " [" << CONSTANT_INFO[i].units << "]" << std::endl;
+    if (CONSTANT_COUNT > 0) {
+        for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
+            std::cout << "   - " << CONSTANT_INFO[i].name << " [" << CONSTANT_INFO[i].units << "] [" << CONSTANT_INFO[i].component << "]" << std::endl;
+        }
     }
 
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Number of computed constants: " << COMPUTED_CONSTANT_COUNT << std::endl;
-    std::cout << "- Computed constants:" << std::endl;
 
-    for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
-        std::cout << "   - " << COMPUTED_CONSTANT_INFO[i].component << "." << COMPUTED_CONSTANT_INFO[i].name << " [" << COMPUTED_CONSTANT_INFO[i].units << "]" << std::endl;
+    if (COMPUTED_CONSTANT_COUNT > 0) {
+        for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
+            std::cout << "   - " << COMPUTED_CONSTANT_INFO[i].name << " [" << COMPUTED_CONSTANT_INFO[i].units << "] [" << COMPUTED_CONSTANT_INFO[i].component << "]" << std::endl;
+        }
     }
 
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Number of algebraic variables: " << ALGEBRAIC_COUNT << std::endl;
-    std::cout << "- Algebraic variables:" << std::endl;
 
-    for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
-        std::cout << "   - " << ALGEBRAIC_INFO[i].component << "." << ALGEBRAIC_INFO[i].name << " [" << ALGEBRAIC_INFO[i].units << "]" << std::endl;
+    if (ALGEBRAIC_COUNT > 0) {
+        for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
+            std::cout << "   - " << ALGEBRAIC_INFO[i].name << " [" << ALGEBRAIC_INFO[i].units << "] [" << ALGEBRAIC_INFO[i].component << "]" << std::endl;
+        }
     }
 
 #if(EXTERNALS == 1)
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "- Number of external variables: " << EXTERNAL_COUNT << std::endl;
-    std::cout << "- External variables:" << std::endl;
 
-    for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
-        std::cout << "   - " << EXTERNAL_INFO[i].component << "." << EXTERNAL_INFO[i].name << " [" << EXTERNAL_INFO[i].units << "]" << std::endl;
+    if (EXTERNAL_COUNT > 0) {
+        for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
+            std::cout << "   - " << EXTERNAL_INFO[i].name << " [" << EXTERNAL_INFO[i].units << "] [" << EXTERNAL_INFO[i].component << "]" << std::endl;
+        }
     }
 #endif
 

@@ -12,40 +12,40 @@ def print_information(model):
     print(f"- libCellML version: {model.LIBCELLML_VERSION}")
     print("---------------------------------------")
     print(f"- Number of constants: {model.CONSTANT_COUNT}")
-    print("- Constants:")
 
-    for i in range(0, model.CONSTANT_COUNT):
-        print(
-            f"   - {model.CONSTANT_INFO[i]['component']}.{model.CONSTANT_INFO[i]['name']} [{model.CONSTANT_INFO[i]['units']}]"
-        )
+    if model.CONSTANT_COUNT > 0:
+        for i in range(0, model.CONSTANT_COUNT):
+            print(
+                f"   - {model.CONSTANT_INFO[i]['name']} [{model.CONSTANT_INFO[i]['units']}] [{model.CONSTANT_INFO[i]['component']}]"
+            )
 
     print("---------------------------------------")
     print(f"- Number of computed constants: {model.COMPUTED_CONSTANT_COUNT}")
-    print("- Computed constants:")
 
-    for i in range(0, model.COMPUTED_CONSTANT_COUNT):
-        print(
-            f"   - {model.COMPUTED_CONSTANT_INFO[i]['component']}.{model.COMPUTED_CONSTANT_INFO[i]['name']} [{model.COMPUTED_CONSTANT_INFO[i]['units']}]"
-        )
+    if model.COMPUTED_CONSTANT_COUNT > 0:
+        for i in range(0, model.COMPUTED_CONSTANT_COUNT):
+            print(
+                f"   - {model.COMPUTED_CONSTANT_INFO[i]['name']} [{model.COMPUTED_CONSTANT_INFO[i]['units']}] [{model.COMPUTED_CONSTANT_INFO[i]['component']}]"
+            )
 
     print("---------------------------------------")
     print(f"- Number of algebraic variables: {model.ALGEBRAIC_COUNT}")
-    print("- Algebraic variables:")
 
-    for i in range(0, model.ALGEBRAIC_COUNT):
-        print(
-            f"   - {model.ALGEBRAIC_INFO[i]['component']}.{model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}]"
-        )
+    if model.ALGEBRAIC_COUNT > 0:
+        for i in range(0, model.ALGEBRAIC_COUNT):
+            print(
+                f"   - {model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}] [{model.ALGEBRAIC_INFO[i]['component']}]"
+            )
 
     if externals:
         print("---------------------------------------")
         print(f"- Number of external variables: {model.EXTERNAL_COUNT}")
-        print("- External variables:")
 
-        for i in range(0, model.EXTERNAL_COUNT):
-            print(
-                f"   - {model.EXTERNAL_INFO[i]['component']}.{model.EXTERNAL_INFO[i]['name']} [{model.EXTERNAL_INFO[i]['units']}]"
-            )
+        if model.EXTERNAL_COUNT > 0:
+            for i in range(0, model.EXTERNAL_COUNT):
+                print(
+                    f"   - {model.EXTERNAL_INFO[i]['name']} [{model.EXTERNAL_INFO[i]['units']}] [{model.EXTERNAL_INFO[i]['component']}]"
+                )
 
     print("---------------------------------------[Information][END]")
 
