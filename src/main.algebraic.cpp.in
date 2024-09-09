@@ -92,9 +92,9 @@ void printArray(const double *values, size_t count, const VariableInfo *info, co
 }
 
 #if(EXTERNALS == 1)
-void printValues(const std::string &title, const double *constants, const double *computedConstants, const double *algebraic, const double *externals, const std::map<std::string, double> &expectedValues)
+void printValues(const std::string &title, const std::map<std::string, double> &expectedValues, const double *constants, const double *computedConstants, const double *algebraic, const double *externals)
 #else
-void printValues(const std::string &title, const double *constants, const double *computedConstants, const double *algebraic, const std::map<std::string, double> &expectedValues)
+void printValues(const std::string &title, const std::map<std::string, double> &expectedValues, const double *constants, const double *computedConstants, const double *algebraic)
 #endif
 {
     int w = 0;
@@ -152,9 +152,9 @@ int main()
     computeComputedConstants(constants, computedConstants);
 
 #if(EXTERNALS == 1)
-    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, externals, @INITIAL_VALUES_GUESSES@);
+    printValues("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computedConstants, algebraic, externals);
 #else
-    printValues("Initial variable values/guesses", constants, computedConstants, algebraic, @INITIAL_VALUES_GUESSES@);
+    printValues("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computedConstants, algebraic);
 #endif
 
     // Compute our variables.
@@ -168,9 +168,9 @@ int main()
     // Output the final value of our constants, computed constants, and algebraic variables.
 
 #if(EXTERNALS == 1)
-    printValues("Final variable values", constants, computedConstants, algebraic, externals, @FINAL_VALUES@);
+    printValues("Final variable values", @FINAL_VALUES@, constants, computedConstants, algebraic, externals);
 #else
-    printValues("Final variable values", constants, computedConstants, algebraic, @FINAL_VALUES@);
+    printValues("Final variable values", @FINAL_VALUES@, constants, computedConstants, algebraic);
 #endif
 
     // Clean up after ourselves.

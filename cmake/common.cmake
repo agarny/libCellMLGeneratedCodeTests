@@ -26,8 +26,6 @@ function(build_executable EXECUTABLE TYPE)
             set(EXTERNALS 0)
         endif()
 
-        set(EXTERNAL_VALUES "{${ARG_EXTERNAL_VALUES}}")
-
         if("${ARG_ENDING_POINT}" STREQUAL "")
             set(ENDING_POINT 1000.0)
         else()
@@ -66,6 +64,8 @@ function(build_executable EXECUTABLE TYPE)
             set(USE_OUTPUT_POINTS true)
         endif()
 
+        set(EXTERNAL_VALUES "{${ARG_EXTERNAL_VALUES}}")
+
         configure_file(../main.ode.cpp.in ${MAIN_CPP})
 
         set(OUTPUT_POINTS "[${ARG_OUTPUT_POINTS}]")
@@ -81,6 +81,9 @@ function(build_executable EXECUTABLE TYPE)
         else()
             set(USE_OUTPUT_POINTS True)
         endif()
+
+        string(REPLACE "{" "[" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
+        string(REPLACE "}" "]" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
 
         configure_file(../main.ode.py.in ${MAIN_PY})
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")

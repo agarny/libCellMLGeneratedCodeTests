@@ -2,7 +2,22 @@ import importlib.util
 from scipy.integrate import solve_ivp
 
 
-externals = @EXTERNALS@
+EXTERNALS = @EXTERNALS@
+
+
+def external_variable(voi, states, rates, constants, computed_constants, algebraic, externals, index):
+    external_values = @EXTERNAL_VALUES@
+
+    for i in range(0, len(external_values)-1):
+        voi0 = external_values[i][0]
+        voi1 = external_values[i+1][0]
+
+        if (voi >= voi0) and (voi < voi1):
+            value0 = external_values[i][index+1]
+
+            return value0 + (voi-voi0)/(voi1-voi0)*(external_values[i+1][index+1]-value0)
+
+    return external_values[-1][index+1]
 
 
 def variable_type(type):
@@ -61,7 +76,7 @@ def print_information(model):
                 f"   - {model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}] [{model.ALGEBRAIC_INFO[i]['component']}]"
             )
 
-    if externals:
+    if EXTERNALS:
         print("---------------------------------------")
         print(f"- Number of external variables: {model.EXTERNAL_COUNT}")
 
@@ -89,14 +104,14 @@ def print_headers():
     for i in range(0, model.ALGEBRAIC_COUNT):
         print(f",{model.ALGEBRAIC_INFO[i]['name']}", end="")
 
-    if externals:
+    if EXTERNALS:
         for i in range(0, model.EXTERNAL_COUNT):
             print(f",{model.EXTERNAL_INFO[i]['name']}", end="")
 
     print("")
 
 
-def print_values(voi, states, constants, computed_constants, algebraic):
+def print_values(voi, states, constants, computed_constants, algebraic, externals=None):
     print(voi, end="")
 
     for i in range(0, model.STATE_COUNT):
@@ -111,11 +126,20 @@ def print_values(voi, states, constants, computed_constants, algebraic):
     for i in range(0, model.ALGEBRAIC_COUNT):
         print(f",{algebraic[i]}", end="")
 
-    if externals:
+    if EXTERNALS:
         for i in range(0, model.EXTERNAL_COUNT):
             print(f",{externals[i]}", end="")
 
     print("")
+
+
+def func(t, states, rates, constants, computed_constants, algebraic, externals=None, external_variable=None):
+    if EXTERNALS:
+        model.compute_rates(t, states, rates, constants, computed_constants, algebraic, externals, external_variable)
+    else:
+        model.compute_rates(t, states, rates, constants, computed_constants, algebraic)
+
+    return rates
 
 
 # Load our model.
@@ -140,12 +164,20 @@ constants = model.create_constants_array()
 computed_constants = model.create_computed_constants_array()
 algebraic = model.create_algebraic_array()
 
+if EXTERNALS:
+    externals = model.create_externals_array()
+
 # Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
 model.initialise_variables(states, rates, constants, computed_constants, algebraic)
 model.compute_computed_constants(constants, computed_constants)
-model.compute_rates(voi, states, rates, constants, computed_constants, algebraic)
-model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
+
+if EXTERNALS:
+    model.compute_rates(voi, states, rates, constants, computed_constants, algebraic, externals, external_variable)
+    model.compute_variables(voi, states, rates, constants, computed_constants, algebraic, externals, external_variable)
+else:
+    model.compute_rates(voi, states, rates, constants, computed_constants, algebraic)
+    model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
 print("")
 print("---------------------------------------[Values][BEGIN]")
@@ -153,7 +185,10 @@ print("---------------------------------------[Values][BEGIN]")
 print_headers()
 
 if not @SKIP_FIRST_OUTPUT_POINT@:
-    print_values(voi, states, constants, computed_constants, algebraic)
+    if EXTERNALS:
+        print_values(voi, states, constants, computed_constants, algebraic, externals)
+    else:
+        print_values(voi, states, constants, computed_constants, algebraic)
 
 # Run our model.
 
@@ -176,24 +211,29 @@ if not @USE_OUTPUT_POINTS@:
 voi = 0.0
 
 for output_point in output_points:
-    def func(t, y, rates, constants, computed_constants, algebraic):
-        model.compute_rates(t, y, rates, constants, computed_constants, algebraic)
-
-        return rates
-
     # Integrate our model.
 
-    res = solve_ivp(func, (voi, output_point), states, args=(rates, constants, computed_constants, algebraic), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
+    if EXTERNALS:
+        res = solve_ivp(func, (voi, output_point), states, args=(rates, constants, computed_constants, algebraic, externals, external_variable), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
+    else:
+        res = solve_ivp(func, (voi, output_point), states, args=(rates, constants, computed_constants, algebraic), method='LSODA', rtol=@RELATIVE_TOLERANCE@, atol=@ABSOLUTE_TOLERANCE@)
+
     states = res.y[:, -1]
 
     voi = output_point
 
     # Compute our variables.
 
-    model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
+    if EXTERNALS:
+        model.compute_variables(voi, states, rates, constants, computed_constants, algebraic, externals, external_variable)
+    else:
+        model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
     # Output the value of our states, constants, computed constants, and algebraic variables.
 
-    print_values(voi, states, constants, computed_constants, algebraic)
+    if EXTERNALS:
+        print_values(voi, states, constants, computed_constants, algebraic, externals)
+    else:
+        print_values(voi, states, constants, computed_constants, algebraic)
 
 print("---------------------------------------[Values][END]")

@@ -3,7 +3,11 @@ import importlib.util
 import math
 
 
-externals = @EXTERNALS@
+EXTERNALS = @EXTERNALS@
+
+
+def external_variable(constants, computed_constants, algebraic, externals, index):
+    return 5.0
 
 
 def print_information(model):
@@ -37,7 +41,7 @@ def print_information(model):
                 f"   - {model.ALGEBRAIC_INFO[i]['name']} [{model.ALGEBRAIC_INFO[i]['units']}] [{model.ALGEBRAIC_INFO[i]['component']}]"
             )
 
-    if externals:
+    if EXTERNALS:
         print("---------------------------------------")
         print(f"- Number of external variables: {model.EXTERNAL_COUNT}")
 
@@ -75,14 +79,14 @@ def print_array(values, count, info, expected_values, w, ew):
             pass
 
 
-def print_values(title, constants, computed_constants, algebraic, expected_values):
+def print_values(title, expected_values, constants, computed_constants, algebraic, externals=None):
     w = 0
 
     w = determine_w(w, constants, model.CONSTANT_COUNT)
     w = determine_w(w, computed_constants, model.COMPUTED_CONSTANT_COUNT)
     w = determine_w(w, algebraic, model.ALGEBRAIC_COUNT)
 
-    if externals:
+    if EXTERNALS:
         w = determine_w(w, externals, model.EXTERNAL_COUNT)
 
     ew = 0
@@ -101,7 +105,7 @@ def print_values(title, constants, computed_constants, algebraic, expected_value
     print_array(computed_constants, model.COMPUTED_CONSTANT_COUNT, model.COMPUTED_CONSTANT_INFO, expected_values, w, ew)
     print_array(algebraic, model.ALGEBRAIC_COUNT, model.ALGEBRAIC_INFO, expected_values, w, ew)
 
-    if externals:
+    if EXTERNALS:
         print_array(externals, model.EXTERNAL_COUNT, model.EXTERNAL_INFO, expected_values, w, ew)
 
     print(f"---------------------------------------[{title}][END]")
@@ -123,17 +127,29 @@ constants = model.create_constants_array()
 computed_constants = model.create_computed_constants_array()
 algebraic = model.create_algebraic_array()
 
+if EXTERNALS:
+    externals = model.create_externals_array()
+
 # Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
 model.initialise_variables(constants, computed_constants, algebraic)
 model.compute_computed_constants(constants, computed_constants)
 
-print_values("Initial variable values/guesses", constants, computed_constants, algebraic, @INITIAL_VALUES_GUESSES@)
+if EXTERNALS:
+    print_values("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computed_constants, algebraic, externals)
+else:
+    print_values("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computed_constants, algebraic)
 
 # Compute our variables.
 
-model.compute_variables(constants, computed_constants, algebraic)
+if EXTERNALS:
+    model.compute_variables(constants, computed_constants, algebraic, externals, external_variable)
+else:
+    model.compute_variables(constants, computed_constants, algebraic)
 
 # Output the final value of our constants, computed constants, and algebraic variables.
 
-print_values("Final variable values", constants, computed_constants, algebraic, @FINAL_VALUES@)
+if EXTERNALS:
+    print_values("Final variable values", @FINAL_VALUES@, constants, computed_constants, algebraic, externals)
+else:
+    print_values("Final variable values", @FINAL_VALUES@, constants, computed_constants, algebraic)
