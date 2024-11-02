@@ -89,48 +89,48 @@ def print_information(model):
     print("---------------------------------------[Information][END]")
 
 
-def print_headers():
-    print("voi", end="")
+def print_headers(file):
+    file.write("voi")
 
     for i in range(0, model.STATE_COUNT):
-        print(f",{model.STATE_INFO[i]['name']}", end="")
+        file.write(f",{model.STATE_INFO[i]['name']}")
 
     for i in range(0, model.CONSTANT_COUNT):
-        print(f",{model.CONSTANT_INFO[i]['name']}", end="")
+        file.write(f",{model.CONSTANT_INFO[i]['name']}")
 
     for i in range(0, model.COMPUTED_CONSTANT_COUNT):
-        print(f",{model.COMPUTED_CONSTANT_INFO[i]['name']}", end="")
+        file.write(f",{model.COMPUTED_CONSTANT_INFO[i]['name']}")
 
     for i in range(0, model.ALGEBRAIC_COUNT):
-        print(f",{model.ALGEBRAIC_INFO[i]['name']}", end="")
+        file.write(f",{model.ALGEBRAIC_INFO[i]['name']}")
 
     if EXTERNALS:
         for i in range(0, model.EXTERNAL_COUNT):
-            print(f",{model.EXTERNAL_INFO[i]['name']}", end="")
+            file.write(f",{model.EXTERNAL_INFO[i]['name']}")
 
-    print("")
+    file.write("\n")
 
 
-def print_values(voi, states, constants, computed_constants, algebraic, externals=None):
-    print(voi, end="")
+def print_values(file, voi, states, constants, computed_constants, algebraic, externals=None):
+    file.write(f"{voi}")
 
     for i in range(0, model.STATE_COUNT):
-        print(f",{states[i]}", end="")
+        file.write(f",{states[i]}")
 
     for i in range(0, model.CONSTANT_COUNT):
-        print(f",{constants[i]}", end="")
+        file.write(f",{constants[i]}")
 
     for i in range(0, model.COMPUTED_CONSTANT_COUNT):
-        print(f",{computed_constants[i]}", end="")
+        file.write(f",{computed_constants[i]}")
 
     for i in range(0, model.ALGEBRAIC_COUNT):
-        print(f",{algebraic[i]}", end="")
+        file.write(f",{algebraic[i]}")
 
     if EXTERNALS:
         for i in range(0, model.EXTERNAL_COUNT):
-            print(f",{externals[i]}", end="")
+            file.write(f",{externals[i]}")
 
-    print("")
+    file.write("\n")
 
 
 def func(t, states, rates, constants, computed_constants, algebraic, externals=None, external_variable=None):
@@ -179,22 +179,21 @@ else:
     model.compute_rates(voi, states, rates, constants, computed_constants, algebraic)
     model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
-print("")
-print("---------------------------------------[Values][BEGIN]")
+file = open("@EXECUTABLE@___python.csv", "w")
 
-print_headers()
+print_headers(file)
 
 if not @SKIP_FIRST_OUTPUT_POINT@:
     if EXTERNALS:
-        print_values(voi, states, constants, computed_constants, algebraic, externals)
+        print_values(file, voi, states, constants, computed_constants, algebraic, externals)
     else:
-        print_values(voi, states, constants, computed_constants, algebraic)
+        print_values(file, voi, states, constants, computed_constants, algebraic)
 
 # Run our model.
 
 output_points = @OUTPUT_POINTS@
 
-if not @USE_OUTPUT_POINTS@:
+if not False:
     i = 0
     voi_max = @ENDING_POINT@
     voi_interval = @POINT_INTERVAL@
@@ -232,8 +231,8 @@ for output_point in output_points:
     # Output the value of our states, constants, computed constants, and algebraic variables.
 
     if EXTERNALS:
-        print_values(voi, states, constants, computed_constants, algebraic, externals)
+        print_values(file, voi, states, constants, computed_constants, algebraic, externals)
     else:
-        print_values(voi, states, constants, computed_constants, algebraic)
+        print_values(file, voi, states, constants, computed_constants, algebraic)
 
-print("---------------------------------------[Values][END]")
+file.close()

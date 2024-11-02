@@ -8,6 +8,7 @@ extern "C" {
 #include <nvector/nvector_serial.h>
 #include <sunlinsol/sunlinsol_dense.h>
 
+#include <fstream>
 #include <iostream>
 
 #define EXTERNALS @EXTERNALS@
@@ -90,66 +91,66 @@ void printInformation()
     std::cout << "---------------------------------------[Information][END]" << std::endl;
 }
 
-void printHeaders()
+void printHeaders(std::ofstream &file)
 {
-    std::cout << "voi";
+    file << "voi";
 
     for (size_t i = 0; i < STATE_COUNT; ++i) {
-        std::cout << "," << STATE_INFO[i].name;
+        file << "," << STATE_INFO[i].name;
     }
 
     for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
-        std::cout << "," << CONSTANT_INFO[i].name;
+        file << "," << CONSTANT_INFO[i].name;
     }
 
     for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
-        std::cout << "," << COMPUTED_CONSTANT_INFO[i].name;
+        file << "," << COMPUTED_CONSTANT_INFO[i].name;
     }
 
     for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
-        std::cout << "," << ALGEBRAIC_INFO[i].name;
+        file << "," << ALGEBRAIC_INFO[i].name;
     }
 
 #if(EXTERNALS == 1)
     for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
-        std::cout << "," << EXTERNAL_INFO[i].name;
+        file << "," << EXTERNAL_INFO[i].name;
     }
 #endif
 
-    std::cout << std::endl;
+    file << std::endl;
 }
 
 #if(EXTERNALS == 1)
-void printValues(double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic, const double *externals)
+void printValues(std::ofstream &file, double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic, const double *externals)
 #else
-void printValues(double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic)
+void printValues(std::ofstream &file, double voi, const double *states, const double *constants, const double *computedConstants, const double *algebraic)
 #endif
 {
-    std::cout << voi;
+    file << voi;
 
     for (size_t i = 0; i < STATE_COUNT; ++i) {
-        std::cout << "," << states[i];
+        file << "," << states[i];
     }
 
     for (size_t i = 0; i < CONSTANT_COUNT; ++i) {
-        std::cout << "," << constants[i];
+        file << "," << constants[i];
     }
 
     for (size_t i = 0; i < COMPUTED_CONSTANT_COUNT; ++i) {
-        std::cout << "," << computedConstants[i];
+        file << "," << computedConstants[i];
     }
 
     for (size_t i = 0; i < ALGEBRAIC_COUNT; ++i) {
-        std::cout << "," << algebraic[i];
+        file << "," << algebraic[i];
     }
 
 #if(EXTERNALS == 1)
     for (size_t i = 0; i < EXTERNAL_COUNT; ++i) {
-        std::cout << "," << externals[i];
+        file << "," << externals[i];
     }
 #endif
 
-    std::cout << std::endl;
+    file << std::endl;
 }
 
 typedef struct {
@@ -214,16 +215,15 @@ int main()
     computeVariables(voi, states, rates, constants, computedConstants, algebraic);
 #endif
 
-    std::cout << std::endl;
-    std::cout << "---------------------------------------[Values][BEGIN]" << std::endl;
+    std::ofstream file("@EXECUTABLE@___c.csv");
 
-    printHeaders();
+    printHeaders(file);
 
     if (!@SKIP_FIRST_OUTPUT_POINT@) {
 #if(EXTERNALS == 1)
-        printValues(voi, states, constants, computedConstants, algebraic, externals);
+        printValues(file, voi, states, constants, computedConstants, algebraic, externals);
 #else
-        printValues(voi, states, constants, computedConstants, algebraic);
+        printValues(file, voi, states, constants, computedConstants, algebraic);
 #endif
     }
 
@@ -300,13 +300,13 @@ int main()
         // Output the value of our states, constants, computed constants, and algebraic variables.
 
 #if(EXTERNALS == 1)
-        printValues(voi, states, constants, computedConstants, algebraic, externals);
+        printValues(file, voi, states, constants, computedConstants, algebraic, externals);
 #else
-        printValues(voi, states, constants, computedConstants, algebraic);
+        printValues(file, voi, states, constants, computedConstants, algebraic);
 #endif
     }
 
-    std::cout << "---------------------------------------[Values][END]" << std::endl;
+    file.close();
 
     // Clean up after ourselves.
 
