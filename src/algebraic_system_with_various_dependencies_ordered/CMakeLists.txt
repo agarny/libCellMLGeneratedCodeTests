@@ -1,4 +1,6 @@
-build_executable(algebraic_system_with_various_dependencies_ordered
+get_filename_component(DIR ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+build_executable(${DIR}
     ALGEBRAIC
     INITIAL_VALUES_GUESSES
         "{\"a\", 14.0}, {\"b\", 1.0}, {\"c\", 1.0}, {\"d\", NAN}, {\"x\", 3.0}, {\"y\", 5.0}"

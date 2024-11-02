@@ -1,4 +1,6 @@
-build_executable(algebraic_eqn_with_one_non_isolated_unknown_externals
+get_filename_component(DIR ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+build_executable(${DIR}
     ALGEBRAIC
     EXTERNALS
     INITIAL_VALUES_GUESSES

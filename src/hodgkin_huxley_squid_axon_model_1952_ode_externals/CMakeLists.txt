@@ -1,4 +1,6 @@
-build_executable(hodgkin_huxley_squid_axon_model_1952_ode_externals
+get_filename_component(DIR ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+build_executable(${DIR}
     ODE
     EXTERNALS
     EXTERNAL_VALUES

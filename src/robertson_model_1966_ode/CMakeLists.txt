@@ -1,4 +1,6 @@
-build_executable(robertson_model_1966_ode
+get_filename_component(DIR ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+
+build_executable(${DIR}
     ODE
     OUTPUT_POINTS
         "4.0e-6, 4.0e-5, 4.0e-4, 4.0e-3, 4.0e-2, 4.0e-1, 4.0e0, 4.0e1, 4.0e2, 4.0e3, 4.0e4, 4.0e5"
