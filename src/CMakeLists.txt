@@ -1,16 +1,22 @@
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+if(C_TEST)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 include(common)
 
-find_package(SUNDIALS REQUIRED cvode kinsol)
+if(C_TEST)
+    find_package(SUNDIALS REQUIRED cvode kinsol)
 
-include_directories(.)
+    include_directories(.)
+endif()
 
-configure_file(common.py ${CMAKE_BINARY_DIR}/common.py)
+if(PYTHON_TEST)
+    configure_file(common.py ${CMAKE_BINARY_DIR}/common.py)
+endif()
 
 file(GLOB ITEMS LIST_DIRECTORIES TRUE "*")
 

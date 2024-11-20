@@ -1,8 +1,13 @@
 function(build_executable EXECUTABLE TYPE)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+    if(C_TEST)
+        include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-    set(MAIN_CPP ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
-    set(MAIN_PY ${CMAKE_BINARY_DIR}/${EXECUTABLE}.py)
+        set(MAIN_CPP ${CMAKE_CURRENT_BINARY_DIR}/main.cpp)
+    endif()
+
+    if(PYTHON_TEST)
+        set(MAIN_PY ${CMAKE_BINARY_DIR}/${EXECUTABLE}.py)
+    endif()
 
     if("${TYPE}" STREQUAL "ODE")
         set(OPTIONS
@@ -66,26 +71,30 @@ function(build_executable EXECUTABLE TYPE)
 
         set(EXTERNAL_VALUES "{${ARG_EXTERNAL_VALUES}}")
 
-        configure_file(../main.ode.cpp.in ${MAIN_CPP})
-
-        set(OUTPUT_POINTS "[${ARG_OUTPUT_POINTS}]")
-
-        if(ARG_SKIP_FIRST_OUTPUT_POINT)
-            set(SKIP_FIRST_OUTPUT_POINT True)
-        else()
-            set(SKIP_FIRST_OUTPUT_POINT False)
+        if(C_TEST)
+            configure_file(../main.ode.cpp.in ${MAIN_CPP})
         endif()
 
-        if("${ARG_OUTPUT_POINTS}" STREQUAL "")
-            set(USE_OUTPUT_POINTS False)
-        else()
-            set(USE_OUTPUT_POINTS True)
+        if(PYTHON_TEST)
+            set(OUTPUT_POINTS "[${ARG_OUTPUT_POINTS}]")
+
+            if(ARG_SKIP_FIRST_OUTPUT_POINT)
+                set(SKIP_FIRST_OUTPUT_POINT True)
+            else()
+                set(SKIP_FIRST_OUTPUT_POINT False)
+            endif()
+
+            if("${ARG_OUTPUT_POINTS}" STREQUAL "")
+                set(USE_OUTPUT_POINTS False)
+            else()
+                set(USE_OUTPUT_POINTS True)
+            endif()
+
+            string(REPLACE "{" "[" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
+            string(REPLACE "}" "]" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
+
+            configure_file(../main.ode.py.in ${MAIN_PY})
         endif()
-
-        string(REPLACE "{" "[" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
-        string(REPLACE "}" "]" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
-
-        configure_file(../main.ode.py.in ${MAIN_PY})
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")
         set(OPTIONS
             EXTERNALS
@@ -106,36 +115,42 @@ function(build_executable EXECUTABLE TYPE)
         set(INITIAL_VALUES_GUESSES "{${ARG_INITIAL_VALUES_GUESSES}}")
         set(FINAL_VALUES "{${ARG_FINAL_VALUES}}")
 
-        configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
+        if(C_TEST)
+            configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
+        endif()
 
-        string(REPLACE "{" "" INITIAL_VALUES_GUESSES "${ARG_INITIAL_VALUES_GUESSES}")
-        string(REPLACE "}" "" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
-        string(REPLACE "\"," "\":" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
-        string(REPLACE "NAN" "math.nan" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
+        if(PYTHON_TEST)
+            string(REPLACE "{" "" INITIAL_VALUES_GUESSES "${ARG_INITIAL_VALUES_GUESSES}")
+            string(REPLACE "}" "" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
+            string(REPLACE "\"," "\":" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
+            string(REPLACE "NAN" "math.nan" INITIAL_VALUES_GUESSES "${INITIAL_VALUES_GUESSES}")
 
-        set(INITIAL_VALUES_GUESSES "{${INITIAL_VALUES_GUESSES}}")
+            set(INITIAL_VALUES_GUESSES "{${INITIAL_VALUES_GUESSES}}")
 
-        string(REPLACE "{" "" FINAL_VALUES "${ARG_FINAL_VALUES}")
-        string(REPLACE "}" "" FINAL_VALUES "${FINAL_VALUES}")
-        string(REPLACE "\"," "\":" FINAL_VALUES "${FINAL_VALUES}")
+            string(REPLACE "{" "" FINAL_VALUES "${ARG_FINAL_VALUES}")
+            string(REPLACE "}" "" FINAL_VALUES "${FINAL_VALUES}")
+            string(REPLACE "\"," "\":" FINAL_VALUES "${FINAL_VALUES}")
 
-        set(FINAL_VALUES "{${FINAL_VALUES}}")
+            set(FINAL_VALUES "{${FINAL_VALUES}}")
 
-        configure_file(../main.algebraic.py.in ${MAIN_PY})
+            configure_file(../main.algebraic.py.in ${MAIN_PY})
+        endif()
     else()
         message(FATAL_ERROR "The type of the executable must be either `ODE` or `ALGEBRAIC`.")
     endif()
 
-    add_executable(${EXECUTABLE}
-        ../common.cpp
+    if(C_TEST)
+        add_executable(${EXECUTABLE}
+            ../common.cpp
 
-        ${MAIN_CPP}
+            ${MAIN_CPP}
 
-        model.c
-    )
+            model.c
+        )
 
-    target_link_libraries(${EXECUTABLE} SUNDIALS::cvode SUNDIALS::kinsol)
+        target_link_libraries(${EXECUTABLE} SUNDIALS::cvode SUNDIALS::kinsol)
 
-    add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
-                       COMMAND ${CMAKE_COMMAND} -E copy ${EXECUTABLE} ${CMAKE_BINARY_DIR}/${EXECUTABLE})
+        add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${EXECUTABLE} ${CMAKE_BINARY_DIR}/${EXECUTABLE})
+    endif()
 endfunction()
