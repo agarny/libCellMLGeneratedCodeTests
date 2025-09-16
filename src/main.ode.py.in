@@ -170,7 +170,7 @@ if EXTERNALS:
 # Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
 model.initialise_variables(states, rates, constants, computed_constants, algebraic)
-model.compute_computed_constants(constants, computed_constants)
+model.compute_computed_constants(states, rates, constants, computed_constants, algebraic)
 
 if EXTERNALS:
     model.compute_rates(voi, states, rates, constants, computed_constants, algebraic, externals, external_variable)

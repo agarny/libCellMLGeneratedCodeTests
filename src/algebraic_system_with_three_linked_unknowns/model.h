@@ -1,4 +1,4 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #pragma once
 
@@ -28,5 +28,5 @@ double * createAlgebraicArray();
 void deleteArray(double *array);
 
 void initialiseVariables(double *constants, double *computedConstants, double *algebraic);
-void computeComputedConstants(double *constants, double *computedConstants);
+void computeComputedConstants(double *constants, double *computedConstants, double *algebraic);
 void computeVariables(double *constants, double *computedConstants, double *algebraic);

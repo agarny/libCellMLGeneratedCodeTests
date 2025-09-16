@@ -1,11 +1,11 @@
-# The content of this file was generated using the Python profile of libCellML 0.6.2.
+# The content of this file was generated using the Python profile of libCellML 0.6.3.
 
 from enum import Enum
 from math import *
 
 
-__version__ = "0.5.0"
-LIBCELLML_VERSION = "0.6.2"
+__version__ = "0.6.0"
+LIBCELLML_VERSION = "0.6.3"
 
 CONSTANT_COUNT = 0
 COMPUTED_CONSTANT_COUNT = 2
@@ -75,7 +75,7 @@ def initialise_variables(constants, computed_constants, algebraic):
     algebraic[0] = 1.0
 
 
-def compute_computed_constants(constants, computed_constants):
+def compute_computed_constants(constants, computed_constants, algebraic):
     pass
 
 

@@ -1,12 +1,12 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #include "model.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-const char VERSION[] = "0.6.0";
-const char LIBCELLML_VERSION[] = "0.6.2";
+const char VERSION[] = "0.7.0";
+const char LIBCELLML_VERSION[] = "0.6.3";
 
 const size_t STATE_COUNT = 4;
 const size_t CONSTANT_COUNT = 0;
@@ -88,7 +88,7 @@ void initialiseVariables(double *states, double *rates, double *constants, doubl
     states[3] = 0.325;
 }
 
-void computeComputedConstants(double *constants, double *computedConstants)
+void computeComputedConstants(double *states, double *rates, double *constants, double *computedConstants, double *algebraic)
 {
 }
 
@@ -107,14 +107,14 @@ void computeRates(double voi, double *states, double *rates, double *constants, 
     double sodium_channel_E_Na = membrane_E_R-115.0;
     double sodium_channel_i_Na = sodium_channel_g_Na*pow(states[2], 3.0)*states[1]*(states[0]-sodium_channel_E_Na);
     rates[0] = -(-membrane_i_Stim+sodium_channel_i_Na+potassium_channel_i_K+leakage_current_i_L)/membrane_Cm;
-    double sodium_channel_m_gate_alpha_m = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0);
     double sodium_channel_m_gate_beta_m = 4.0*exp(states[0]/18.0);
+    double sodium_channel_m_gate_alpha_m = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0);
     rates[2] = sodium_channel_m_gate_alpha_m*(1.0-states[2])-sodium_channel_m_gate_beta_m*states[2];
-    double sodium_channel_h_gate_alpha_h = 0.07*exp(states[0]/20.0);
     double sodium_channel_h_gate_beta_h = 1.0/(exp((states[0]+30.0)/10.0)+1.0);
+    double sodium_channel_h_gate_alpha_h = 0.07*exp(states[0]/20.0);
     rates[1] = sodium_channel_h_gate_alpha_h*(1.0-states[1])-sodium_channel_h_gate_beta_h*states[1];
-    double potassium_channel_n_gate_alpha_n = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0);
     double potassium_channel_n_gate_beta_n = 0.125*exp(states[0]/80.0);
+    double potassium_channel_n_gate_alpha_n = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0);
     rates[3] = potassium_channel_n_gate_alpha_n*(1.0-states[3])-potassium_channel_n_gate_beta_n*states[3];
 }
 

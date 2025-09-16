@@ -1,12 +1,12 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #include "model.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-const char VERSION[] = "0.6.0";
-const char LIBCELLML_VERSION[] = "0.6.2";
+const char VERSION[] = "0.7.0";
+const char LIBCELLML_VERSION[] = "0.6.3";
 
 const size_t STATE_COUNT = 4;
 const size_t CONSTANT_COUNT = 1;
@@ -531,7 +531,7 @@ void initialiseVariables(double *states, double *rates, double *constants, doubl
     algebraic[10] = 0.0;
 }
 
-void computeComputedConstants(double *constants, double *computedConstants)
+void computeComputedConstants(double *states, double *rates, double *constants, double *computedConstants, double *algebraic)
 {
     double membrane_E_R = 0.0;
     computedConstants[0] = membrane_E_R+12.0;
@@ -542,8 +542,8 @@ void computeRates(double voi, double *states, double *rates, double *constants, 
     findRoot0(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot2(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot3(voi, states, rates, constants, computedConstants, algebraic, externals);
-    findRoot12(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot13(voi, states, rates, constants, computedConstants, algebraic, externals);
+    findRoot12(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot14(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot11(voi, states, rates, constants, computedConstants, algebraic, externals);
     algebraic[5] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0);
@@ -551,16 +551,16 @@ void computeRates(double voi, double *states, double *rates, double *constants, 
     findRoot1(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot6(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot7(voi, states, rates, constants, computedConstants, algebraic, externals);
-    findRoot8(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot9(voi, states, rates, constants, computedConstants, algebraic, externals);
+    findRoot8(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot10(voi, states, rates, constants, computedConstants, algebraic, externals);
 }
 
 void computeVariables(double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic, double *externals, ExternalVariable externalVariable)
 {
     findRoot3(voi, states, rates, constants, computedConstants, algebraic, externals);
-    findRoot12(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot13(voi, states, rates, constants, computedConstants, algebraic, externals);
+    findRoot12(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot14(voi, states, rates, constants, computedConstants, algebraic, externals);
     findRoot11(voi, states, rates, constants, computedConstants, algebraic, externals);
     algebraic[5] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0);

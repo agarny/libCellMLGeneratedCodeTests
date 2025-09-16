@@ -1,11 +1,11 @@
-# The content of this file was generated using the Python profile of libCellML 0.6.2.
+# The content of this file was generated using the Python profile of libCellML 0.6.3.
 
 from enum import Enum
 from math import *
 
 
-__version__ = "0.5.0"
-LIBCELLML_VERSION = "0.6.2"
+__version__ = "0.6.0"
+LIBCELLML_VERSION = "0.6.3"
 
 STATE_COUNT = 4
 CONSTANT_COUNT = 5
@@ -86,7 +86,7 @@ def initialise_variables(states, rates, constants, computed_constants, algebraic
     constants[4] = 36.0
 
 
-def compute_computed_constants(constants, computed_constants):
+def compute_computed_constants(states, rates, constants, computed_constants, algebraic):
     pass
 
 
@@ -99,14 +99,14 @@ def compute_rates(voi, states, rates, constants, computed_constants, algebraic):
     sodium_channel_E_Na = constants[1]-115.0
     algebraic[3] = constants[3]*pow(states[2], 3.0)*states[1]*(states[0]-sodium_channel_E_Na)
     rates[0] = -(-algebraic[0]+algebraic[3]+algebraic[2]+algebraic[1])/constants[0]
-    algebraic[4] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)
     algebraic[5] = 4.0*exp(states[0]/18.0)
+    algebraic[4] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)
     rates[2] = algebraic[4]*(1.0-states[2])-algebraic[5]*states[2]
-    algebraic[6] = 0.07*exp(states[0]/20.0)
     algebraic[7] = 1.0/(exp((states[0]+30.0)/10.0)+1.0)
+    algebraic[6] = 0.07*exp(states[0]/20.0)
     rates[1] = algebraic[6]*(1.0-states[1])-algebraic[7]*states[1]
-    algebraic[8] = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0)
     algebraic[9] = 0.125*exp(states[0]/80.0)
+    algebraic[8] = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0)
     rates[3] = algebraic[8]*(1.0-states[3])-algebraic[9]*states[3]
 
 

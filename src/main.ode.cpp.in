@@ -205,7 +205,7 @@ int main()
     // value/guess.
 
     initialiseVariables(states, rates, constants, computedConstants, algebraic);
-    computeComputedConstants(constants, computedConstants);
+    computeComputedConstants(states, rates, constants, computedConstants, algebraic);
 
 #if(EXTERNALS == 1)
     computeRates(voi, states, rates, constants, computedConstants, algebraic, externals, externalVariable);

@@ -1,4 +1,4 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #pragma once
 
@@ -37,6 +37,6 @@ void deleteArray(double *array);
 typedef double (* ExternalVariable)(double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic, double *externals, size_t index);
 
 void initialiseVariables(double *states, double *rates, double *constants, double *computedConstants, double *algebraic);
-void computeComputedConstants(double *constants, double *computedConstants);
+void computeComputedConstants(double *states, double *rates, double *constants, double *computedConstants, double *algebraic);
 void computeRates(double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic, double *externals, ExternalVariable externalVariable);
 void computeVariables(double voi, double *states, double *rates, double *constants, double *computedConstants, double *algebraic, double *externals, ExternalVariable externalVariable);

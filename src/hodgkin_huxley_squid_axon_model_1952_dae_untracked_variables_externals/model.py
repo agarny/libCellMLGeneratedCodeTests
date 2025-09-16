@@ -1,11 +1,11 @@
-# The content of this file was generated using the Python profile of libCellML 0.6.2.
+# The content of this file was generated using the Python profile of libCellML 0.6.3.
 
 from enum import Enum
 from math import *
 
 
-__version__ = "0.5.0"
-LIBCELLML_VERSION = "0.6.2"
+__version__ = "0.6.0"
+LIBCELLML_VERSION = "0.6.3"
 
 STATE_COUNT = 4
 CONSTANT_COUNT = 1
@@ -450,7 +450,7 @@ def initialise_variables(states, rates, constants, computed_constants, algebraic
     algebraic[10] = 0.0
 
 
-def compute_computed_constants(constants, computed_constants):
+def compute_computed_constants(states, rates, constants, computed_constants, algebraic):
     membrane_E_R = 0.0
     computed_constants[0] = membrane_E_R+12.0
 
@@ -459,8 +459,8 @@ def compute_rates(voi, states, rates, constants, computed_constants, algebraic, 
     find_root_0(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_2(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_3(voi, states, rates, constants, computed_constants, algebraic, externals)
-    find_root_12(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_13(voi, states, rates, constants, computed_constants, algebraic, externals)
+    find_root_12(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_14(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_11(voi, states, rates, constants, computed_constants, algebraic, externals)
     algebraic[5] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)
@@ -468,15 +468,15 @@ def compute_rates(voi, states, rates, constants, computed_constants, algebraic, 
     find_root_1(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_6(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_7(voi, states, rates, constants, computed_constants, algebraic, externals)
-    find_root_8(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_9(voi, states, rates, constants, computed_constants, algebraic, externals)
+    find_root_8(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_10(voi, states, rates, constants, computed_constants, algebraic, externals)
 
 
 def compute_variables(voi, states, rates, constants, computed_constants, algebraic, externals, external_variable):
     find_root_3(voi, states, rates, constants, computed_constants, algebraic, externals)
-    find_root_12(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_13(voi, states, rates, constants, computed_constants, algebraic, externals)
+    find_root_12(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_14(voi, states, rates, constants, computed_constants, algebraic, externals)
     find_root_11(voi, states, rates, constants, computed_constants, algebraic, externals)
     algebraic[5] = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)

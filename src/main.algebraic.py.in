@@ -133,7 +133,7 @@ if EXTERNALS:
 # Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
 model.initialise_variables(constants, computed_constants, algebraic)
-model.compute_computed_constants(constants, computed_constants)
+model.compute_computed_constants(constants, computed_constants, algebraic)
 
 if EXTERNALS:
     print_values("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computed_constants, algebraic, externals)

@@ -1,12 +1,12 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #include "model.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-const char VERSION[] = "0.6.0";
-const char LIBCELLML_VERSION[] = "0.6.2";
+const char VERSION[] = "0.7.0";
+const char LIBCELLML_VERSION[] = "0.6.3";
 
 const size_t STATE_COUNT = 4;
 const size_t CONSTANT_COUNT = 5;
@@ -124,7 +124,7 @@ void initialiseVariables(double *states, double *rates, double *constants, doubl
     constants[4] = 36.0;
 }
 
-void computeComputedConstants(double *constants, double *computedConstants)
+void computeComputedConstants(double *states, double *rates, double *constants, double *computedConstants, double *algebraic)
 {
     computedConstants[0] = constants[1]+12.0;
 }
@@ -140,11 +140,11 @@ void computeRates(double voi, double *states, double *rates, double *constants, 
     rates[0] = -(-algebraic[0]+externals[0]+algebraic[2]+algebraic[1])/constants[0];
     algebraic[4] = 4.0*exp(states[0]/18.0);
     rates[2] = algebraic[3]*(1.0-states[2])-algebraic[4]*states[2];
-    algebraic[5] = 0.07*exp(states[0]/20.0);
     algebraic[6] = 1.0/(exp((states[0]+30.0)/10.0)+1.0);
+    algebraic[5] = 0.07*exp(states[0]/20.0);
     rates[1] = algebraic[5]*(1.0-states[1])-algebraic[6]*states[1];
-    algebraic[7] = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0);
     algebraic[8] = 0.125*exp(states[0]/80.0);
+    algebraic[7] = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0);
     rates[3] = algebraic[7]*(1.0-states[3])-algebraic[8]*states[3];
 }
 

@@ -149,7 +149,7 @@ int main()
     // Initialise our constants, computed constants, and algebraic variables and output their initial value/guess.
 
     initialiseVariables(constants, computedConstants, algebraic);
-    computeComputedConstants(constants, computedConstants);
+    computeComputedConstants(constants, computedConstants, algebraic);
 
 #if(EXTERNALS == 1)
     printValues("Initial variable values/guesses", @INITIAL_VALUES_GUESSES@, constants, computedConstants, algebraic, externals);

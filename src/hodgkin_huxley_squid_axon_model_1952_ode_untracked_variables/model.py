@@ -1,11 +1,11 @@
-# The content of this file was generated using the Python profile of libCellML 0.6.2.
+# The content of this file was generated using the Python profile of libCellML 0.6.3.
 
 from enum import Enum
 from math import *
 
 
-__version__ = "0.5.0"
-LIBCELLML_VERSION = "0.6.2"
+__version__ = "0.6.0"
+LIBCELLML_VERSION = "0.6.3"
 
 STATE_COUNT = 4
 CONSTANT_COUNT = 0
@@ -66,7 +66,7 @@ def initialise_variables(states, rates, constants, computed_constants, algebraic
     states[3] = 0.325
 
 
-def compute_computed_constants(constants, computed_constants):
+def compute_computed_constants(states, rates, constants, computed_constants, algebraic):
     pass
 
 
@@ -84,14 +84,14 @@ def compute_rates(voi, states, rates, constants, computed_constants, algebraic):
     sodium_channel_E_Na = membrane_E_R-115.0
     sodium_channel_i_Na = sodium_channel_g_Na*pow(states[2], 3.0)*states[1]*(states[0]-sodium_channel_E_Na)
     rates[0] = -(-membrane_i_Stim+sodium_channel_i_Na+potassium_channel_i_K+leakage_current_i_L)/membrane_Cm
-    sodium_channel_m_gate_alpha_m = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)
     sodium_channel_m_gate_beta_m = 4.0*exp(states[0]/18.0)
+    sodium_channel_m_gate_alpha_m = 0.1*(states[0]+25.0)/(exp((states[0]+25.0)/10.0)-1.0)
     rates[2] = sodium_channel_m_gate_alpha_m*(1.0-states[2])-sodium_channel_m_gate_beta_m*states[2]
-    sodium_channel_h_gate_alpha_h = 0.07*exp(states[0]/20.0)
     sodium_channel_h_gate_beta_h = 1.0/(exp((states[0]+30.0)/10.0)+1.0)
+    sodium_channel_h_gate_alpha_h = 0.07*exp(states[0]/20.0)
     rates[1] = sodium_channel_h_gate_alpha_h*(1.0-states[1])-sodium_channel_h_gate_beta_h*states[1]
-    potassium_channel_n_gate_alpha_n = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0)
     potassium_channel_n_gate_beta_n = 0.125*exp(states[0]/80.0)
+    potassium_channel_n_gate_alpha_n = 0.01*(states[0]+10.0)/(exp((states[0]+10.0)/10.0)-1.0)
     rates[3] = potassium_channel_n_gate_alpha_n*(1.0-states[3])-potassium_channel_n_gate_beta_n*states[3]
 
 

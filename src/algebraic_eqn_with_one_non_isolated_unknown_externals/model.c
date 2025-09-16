@@ -1,12 +1,12 @@
-/* The content of this file was generated using the C profile of libCellML 0.6.2. */
+/* The content of this file was generated using the C profile of libCellML 0.6.3. */
 
 #include "model.h"
 
 #include <math.h>
 #include <stdlib.h>
 
-const char VERSION[] = "0.6.0";
-const char LIBCELLML_VERSION[] = "0.6.2";
+const char VERSION[] = "0.7.0";
+const char LIBCELLML_VERSION[] = "0.6.3";
 
 const size_t CONSTANT_COUNT = 0;
 const size_t COMPUTED_CONSTANT_COUNT = 2;
@@ -119,7 +119,7 @@ void initialiseVariables(double *constants, double *computedConstants, double *a
     algebraic[0] = 1.0;
 }
 
-void computeComputedConstants(double *constants, double *computedConstants)
+void computeComputedConstants(double *constants, double *computedConstants, double *algebraic)
 {
 }
 
