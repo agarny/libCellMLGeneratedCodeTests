@@ -72,7 +72,7 @@ function(build_executable EXECUTABLE TYPE)
         set(EXTERNAL_VALUES "{${ARG_EXTERNAL_VALUES}}")
 
         if(C_TEST)
-            configure_file(../main.ode.cpp.in ${MAIN_CPP})
+            configure_file(../main.ode.in.cpp ${MAIN_CPP})
         endif()
 
         if(PYTHON_TEST)
@@ -93,7 +93,7 @@ function(build_executable EXECUTABLE TYPE)
             string(REPLACE "{" "[" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
             string(REPLACE "}" "]" EXTERNAL_VALUES "${EXTERNAL_VALUES}")
 
-            configure_file(../main.ode.py.in ${MAIN_PY})
+            configure_file(../main.ode.in.py ${MAIN_PY})
         endif()
     elseif("${TYPE}" STREQUAL "ALGEBRAIC")
         set(OPTIONS
@@ -116,7 +116,7 @@ function(build_executable EXECUTABLE TYPE)
         set(FINAL_VALUES "{${ARG_FINAL_VALUES}}")
 
         if(C_TEST)
-            configure_file(../main.algebraic.cpp.in ${MAIN_CPP})
+            configure_file(../main.algebraic.in.cpp ${MAIN_CPP})
         endif()
 
         if(PYTHON_TEST)
@@ -133,7 +133,7 @@ function(build_executable EXECUTABLE TYPE)
 
             set(FINAL_VALUES "{${FINAL_VALUES}}")
 
-            configure_file(../main.algebraic.py.in ${MAIN_PY})
+            configure_file(../main.algebraic.in.py ${MAIN_PY})
         endif()
     else()
         message(FATAL_ERROR "The type of the executable must be either `ODE` or `ALGEBRAIC`.")
