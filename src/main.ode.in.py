@@ -1,5 +1,6 @@
 import importlib.util
 from scipy.integrate import solve_ivp
+import os
 
 
 EXTERNALS = @EXTERNALS@
@@ -179,7 +180,7 @@ else:
     model.compute_rates(voi, states, rates, constants, computed_constants, algebraic)
     model.compute_variables(voi, states, rates, constants, computed_constants, algebraic)
 
-file = open("@EXECUTABLE@___python.csv", "w")
+file = open(os.path.join(os.path.dirname(__file__), "@EXECUTABLE@___python.csv"), "w")
 
 print_headers(file)
 

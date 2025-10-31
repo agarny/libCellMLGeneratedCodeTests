@@ -183,7 +183,7 @@ int func(double voi, N_Vector y, N_Vector yDot, void *userData)
     return 0;
 }
 
-int main()
+int main(int argc, char **argv)
 {
     // Some information about the model.
 
@@ -215,7 +215,7 @@ int main()
     computeVariables(voi, states, rates, constants, computedConstants, algebraic);
 #endif
 
-    std::ofstream file("@EXECUTABLE@___c.csv");
+    std::ofstream file(std::string(argv[0]) + "___c.csv");
 
     printHeaders(file);
 
